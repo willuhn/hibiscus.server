@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!--
- $Revision: 1.1 $
- $Date: 2011/11/12 15:09:59 $
+ $Revision: 1.2 $
+ $Date: 2011/11/12 15:52:41 $
  $Author: willuhn $
  
  Copyright (c) by willuhn software & services
  All rights reserved
  
  Build-Script, um die komplette Server-Distribution des Payment-Servers
- zu erstellen. Es erstellt ein bz2-Archiv mit Jameica und den Plugins:
+ zu erstellen. Es erstellt ein ZIP-Archiv mit Jameica und den Plugins:
  
  - jameica.webadmin
  - jameica.xmlrpc
