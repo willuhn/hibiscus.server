@@ -1,0 +1,63 @@
+#parse("includes/header.vm")
+
+<script type="text/javascript">
+  function doExecute(v)
+  {
+    if (!window.confirm("Sicher?"))
+      return;
+    document.form_start.submit();
+  }
+</script>
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+      #parse("includes/jobs.vm")
+    </td>
+    <td style="padding-left: 20px;width:300px">
+
+      <h2>Status</h2>
+
+      <div class="note">Server-Version: $meta.version</div>
+      
+      #if($c.isRunning())
+        <div class="note"><b>Synchronisierung läuft...</b></div>
+      #elseif($jobs.nextExecution)
+        <div class="note">Nächste Synchronisierung: $jobs.nextExecution</div>
+      #else
+        <div class="note" style="border:1px dotted #800000;background-color: #F7E7E0;font-weight: bolder">
+          Scheduler-Service gestoppt
+          #if(!$c.isRunning())
+            [<a href="?action=start">Service starten</a>]
+          #end
+        </div>
+      #end
+      #if(!$c.isRunning() && $c.haveJobs())
+        <form name="form_start" method="post">
+          <div class="note">
+            <input type="hidden" name="action" value="execute">
+            <a title="Synchronisierung jetzt manuell starten" href="javascript:doExecute()">Synchronisierung jetzt manuell starten</a>
+          </div>
+        </form>
+      #end
+
+      <h2>Aufgaben</h2>
+      <ul class="navi">
+        <li><a href="settings.html"><img src="img/document-properties.png" width="16" height="16" border="0" style="margin-right: 5px">System-Einstellungen ändern...</a></li>
+        <li><a href="passports.html"><img src="img/mail-send-receive.png" width="16" height="16" border="0" style="margin-right: 5px">HBCI-Sicherheitsmedien verwalten...</a></li>
+        <li><a href="accounts.html"><img src="img/system-file-manager.png" width="16" height="16" border="0" style="margin-right: 5px">Konten verwalten...</a></li>
+        <li><a href="/webadmin/"><img src="img/computer.png" width="16" height="16" border="0" style="margin-right: 5px">Jameica Systemkonfiguration...</a></li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<div style="margin-top:20px">
+  #parse("includes/log.vm")
+</div>
+
+#parse("includes/footer.vm")

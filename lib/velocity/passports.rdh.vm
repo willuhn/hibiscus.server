@@ -1,0 +1,143 @@
+#parse("includes/header.vm")
+
+<style>
+    table.data td.keystatus-false {
+       padding                  : 1px 1px 1px 25px;
+       color                    : #6E1416;
+       background-image         : url('/webadmin/img/status-error.png');
+       background-repeat        : no-repeat;
+    }
+    table.data td.keystatus-true {
+       padding                  : 1px 1px 1px 25px;
+       color                    : #46824A;
+       background-image         : url('/webadmin/img/status-ok.png');
+       background-repeat        : no-repeat;
+    }
+</style>
+
+<script type="text/javascript">
+  
+  function doDelete(v)
+  {
+    if (!window.confirm("Sicher?\n" +
+                        "Hierbei wird nur die Schlüsseldatei gelöscht.\n" +
+                        "Die Konten, Umsätze und Aufträge bleiben erhalten."))
+      return;
+    document.form1.elements.action.value = "delete";
+    document.form1.elements.key.value = v;
+    document.form1.submit();
+  }
+
+</script>
+
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+  &raquo;
+  <a href="passports.rdh.html">$c.name</a>
+</div>
+
+<h2>$c.name</h2>
+
+<form method="post" name="form1">
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="key" value="">
+
+  <h3>Installierte HBCI-Schlüsseldisketten</h3>
+  
+  <table class="data">
+  	<tr>
+  	  <th>Schlüsseldatei</th>
+        <th>Zugeordnete Konten</th>
+        <th>Aktion</th>
+  	</tr>
+  
+    #set($list = $c.keys)
+    #if($list.size() > 0)
+      #foreach($p in $list)
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+          <td class="keystatus-$c.exists($p)">$p.filename</td>
+          <td>
+            <table class="inner">
+              <tr>
+                <th>Name</th>
+                <th>Kontonummer</th>
+                <th style="text-align:right">Saldo</th>
+              </tr>
+              #foreach($k in $p.konten)
+                <tr>
+                  <td>$k.bezeichnung</td>
+                  <td>$k.kontonummer</td>
+                  <td style="text-align:right">$format.getSaldoText($k)</td>
+                </tr>
+              #end
+            </table>
+          </td>
+          <td>
+            <a title="Konfiguration löschen" href="javascript:doDelete('$format.escapePath($p.filename)')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
+          </td>
+        </tr>
+      #end
+    #else
+      <tr><td colspan="3">Keine Schlüsseldisketten installiert. Bitte lade zuerst eine Schlüsseldiskette hoch.</td></tr>
+    #end
+  </table>
+</form>
+
+
+<h3>Neue Schlüsseldiskette hochladen</h3>
+
+<form method="post" name="form2" enctype="multipart/form-data">
+
+  <table class="data">	
+    <tr>
+      <th>Name</th>
+      <th>Wert</th>
+    </tr>
+    <tr>
+      <td>Datei-Format</td>
+      <td>
+        <select name="format">
+          #set($format = $c.format)
+          #foreach($f in $c.formats)
+            <option value="$f.class.name" #if($format && $f.class.name == $format)selected#end>$f.name</option>
+          #end
+        </select>
+      </td>
+    </tr>
+  	<tr>
+  		<td>Schlüsseldiskette</td>
+  		<td><input type="file" name="filename" /></td>
+  	</tr>
+  	<tr>
+  		<td>Passwort der Schlüsseldiskette</td>
+  		<td><input type="password" name="password" value="$!c.password" /></td>
+  	</tr>
+  	<tr>
+  		<td>Passwort der Schlüsseldiskette (Wiederholung)</td>
+  		<td><input type="password" name="password2" value="$!c.password2" /></td>
+  	</tr>
+    <tr>
+      <td>HBCI-Version</td>
+      <td>
+        <select name="version">
+          #set($v = $!c.version)
+          <option value="201" #if($v && $v == "201")selected#end>HBCI 2.01</option>
+          <option value="210" #if($v && $v == "210")selected#end>HBCI 2.1</option>
+          <option value="220" #if($v && $v == "220")selected#end>HBCI 2.2</option>
+          <option value="plus" #if($v && $v == "plus")selected#end>HBCI+ (HBCI 2.2 mit PIN/TAN-Unterstützung)</option>
+          <option value="300" #if($v && $v == "300")selected#end>FinTS 3.0</option>
+        </select>
+      </td>
+    </tr>
+  	<tr>
+  		<td>&nbsp;</td>
+  		<td><input type="submit" value="Importieren..."></td>
+  	</tr>
+  </table>
+</form>
+
+#parse("includes/footer.vm")
+

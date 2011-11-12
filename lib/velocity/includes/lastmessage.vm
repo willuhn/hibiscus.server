@@ -1,0 +1,29 @@
+<style>
+    div.message {
+      padding                  : 4px 1px 1px 2px;
+      margin                   : 10px 0px 0px 0px;
+		  border                   : 1px solid #E0E0E0;
+		  background               : #f8f8f8;
+    }
+    
+    div.message span {
+      padding                  : 1px 1px 1px 25px;
+    }
+    
+    div.message span.type-$message.error {
+       color                    : #6E1416;
+       background-image         : url('/webadmin/img/status-error.png');
+       background-repeat        : no-repeat;
+    }
+    div.message span.type-$message.success {
+       color                    : #46824A;
+       background-image         : url('/webadmin/img/status-ok.png');
+       background-repeat        : no-repeat;
+    }
+</style>
+
+#if($message.last)
+  <div class="message">
+    <span class="type-$message.last.type">$!message.last.text</span>
+  </div>
+#end  

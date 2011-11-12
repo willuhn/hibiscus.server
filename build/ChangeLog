@@ -1,0 +1,180 @@
+2011-10-25 Version 2.1.0 (beta)
+
+  * Beta basierend auf HEAD-Snapshots
+  * Der Payment-Server ist jetzt Open-Source (GPLv2)
+
+2011-09-28 Version 2.0.2 (beta)
+
+  * Beta basierend auf HEAD-Snapshots
+  * In Lizenzprüfung nur jene Konten zählen, bei denen Sync-Optionen aktiviert
+    sind. Erlaubt das Vorhandensein zusätzlicher Konten, die nur manuell via
+    Desktop verwendet werden.
+
+2011-07-25 Version 2.0.1 (beta)
+
+  * Beta basierend auf HEAD-Snapshots
+
+2011-06-20 Version 2.0.0
+
+  * Neues Release basierend auf Jameica 2.0.0 und Hibiscus 2.0.0
+  * Download von Zertifikaten
+
+2011-05-11 Version 1.5.9 (beta)
+
+ * CHG: Schlüssel-Länge bei AES-basiertem Wallet geändert. 
+ * NEW: Aktuelle Snapshots von Hibiscus 1.13-nightly und Jameica 1.11-nightly
+
+2011-04-06 Version 1.5.8 (beta)
+
+ * CHG: Wenn die Migration des PIN-Wallet auf die AES-Engine fehlschlaegt,
+        wird weiterhin die RSA-Engine verwendet
+
+2011-03-10 Version 1.5.7 (beta)
+
+ * BUG: SEPA-Ueberweisungen liessen sich via XML-RPC nicht anlegen
+
+2011-02-10 Version 1.5.6 (beta)
+
+ * NEW: Bugfixes im Plugin hibiscus.xmlrpc
+
+2011-02-09 Version 1.5.5 (beta)
+
+ * NEW: Migration des PIN-Wallet auf AES-Engine
+ * NEW: Engine des PIN-Wallet via "wallet.engine" in de.willuhn.jameica.hbci.payment.Plugin.properties
+        konfigurierbar
+
+2011-02-07 Version 1.5.4 (beta)
+
+ * NEW: Plugin hibiscus.xmlrpc auf 1.2 aktualisiert
+
+2011-02-07 Version 1.5.3 (beta)
+
+ * NEW: Aktualisieren der zu einer PIN/TAN-Konfiguration zugeordneten Konten
+
+2011-01-27 Version 1.5.2 (beta)
+
+ * BUG: "URL nach erfolgreicher Synchronisierung aufrufen" funktionierte nicht,
+        wenn es eine HTTPS-URL war
+ * NEW: ueber https://<server>:8080/webadmin koennen jetzt SSL-Zertifikate
+        importiert bzw. geloescht werden
+        
+2011-01-26 Version 1.5.1 (beta)
+
+ * NEW: Plugin hibiscus.xmlrpc auf 1.1 aktualisiert
+ * NEW: Webfrontend zum Konfigurieren der XML-RPC-Services
+
+2011-01-18 Version 1.5.0 (beta)
+
+ * Basierend auf Jameica 1.11.0 und Hibiscus 1.13.0 (Nightly)
+ * BUG: Liste der letzten Umsaetze und Protokolle in den Kontodetails waren nicht korrekt sortiert
+
+2010-11-10 Version 1.4.0
+
+  * Neue Release basierend auf Jameica 1.10 und Hibiscus 1.12
+
+2010-11-08 Version 1.3.4 (beta)
+
+ * BUG: Mögliche Endlos-Rekursion beim Anlegen einer neuen PIN/TAN-Konfiguration
+
+2010-11-04 Version 1.3.3 (beta)
+        
+ * NEW: TAN-Verfahren aus HBCI4Java-Passport-Datei ermitteln, falls noch nicht konfiguriert
+ * DEL: Plugin "jameica.webtools" entfernt - ist jetzt Bestandteil von "jameica.webadmin"
+ * NEW: Anzeige und Akzeptierung der Lizenzbestimmungen im Webfrontend
+ * NEW: Upload der Lizenzdatei ueber Webfrontend
+
+2010/09 Version 1.3.2 (beta)
+
+ * NEW: Es können nun mehrere Kartenleser-Konfigurationen angelegt
+        werden. Somit ist es moeglich, mehrere Kartenleser parallel
+        am Payment-Server zu nutzen
+
+2010-06-14 Version 1.3.1 (beta)
+
+ * Basierend auf Jameica 1.10.0 und Hibiscus 1.12.0 (Nightly)
+
+ * NEW: Einzelne Wochentage koennen nun von der automatischen Synchronisierung
+        ausgeschlossen werden. Ist z.Bsp. sinnvoll, wenn die Bank am Wochenende
+        eher schlecht erreichbar ist und zu unnoetigen Stopps des Scheduler-
+        Services fuehren wuerde.
+ * NEW: REST-Services für den bequemen Zugriff auf den Hibiscus Payment-Server.
+        Verfügbare REST-URLs siehe https://<server>:8080/webadmin/rest
+ * NEW: Notify-URL zur Benachrichtigung eines Fremdsystems, wenn die Synchronisierung
+        eines Kontos erfolgreich durchgefuehrt wurde.
+   
+
+
+2010-04-07 Version 1.3.0-84
+
+ * Aktuelle Release basierend auf Jameica 1.9.0 und Hibiscus 1.11.0
+
+ * NEW: Konto-Synchronisierung kann nun - unabhängig vom Scheduler-Intervall -
+        auch manuell gestartet werden
+ * NEW: PIN/TAN-Konfiguration und Schlüsseldisketten können vom Server gelöscht werden
+ * NEW: In der Liste der Sicherheitsmedien (PIN/TAN, Schlüsseldiskette) werden die
+        zugeordneten Konten angezeigt. Erlaubt einen besseren Überblick, welches
+        Konto mit welchem Sicherheitsmedium verwendet wird.
+ * NEW: Konten werden in der Kontoliste in grauer Farbe angezeigt, wenn alle
+        Synchronisierungsaufgaben deaktiviert sind
+ * NEW: Konten können gelöscht werden (incl. aller zugehörigen Umsätze und Aufträge)
+ * CHG: Refactoring des Webfrontends mittels jameica.webtools
+ * NEW: SEPA-Ueberweisungen
+ * NEW: Integration von jameica.sensors zur automatischen Mail-Benachrichtigung
+        bei Ausfall des Schedulers und zur grafischen Anzeige des Saldo-Verlaufs
+        der Konten (RRD-Chart)
+ 
+----------------------
+
+2009-08-23 Version 1.1-69
+
+ * Aktuelle Release basierend auf Jameica 1.8.0 und Hibiscus 1.10.0
+
+2009-06-26 Version 1.0-68
+
+ * Routine-maessiges Rebuild ohne neue Features
+
+2009-05-13 Version 1.0-67
+
+ * hibiscus.server: Bugfix im PIN/TAN-Modul. Der Fehler führte unter Windows dazu,
+                    dass eine angelegte PIN/TAN-Konfiguration nicht mehr geöffnet
+                    werden konnte.
+
+2009-04-29 Version 1.0-63
+
+ * hibiscus.soap: Support fuer erweiterte Verwendungszwecke
+
+2009-04-03 Version 1.0-60
+
+ * hibiscus: PostgreSQL-Support
+
+2009-03-09 Version 1.0-50
+
+ * hibiscus.xmlrpc: Neue Option "quoting.char" in
+   de.willuhn.jameica.hbci.xmlrpc.Plugin.properties, um die Spalten von
+   Rueckgabewerten, die in Listenform (getrennt mit ":") ausgegeben werden,
+   mit einem Quoting-Zeichen zu umschliessen.
+
+2009-02-18 Version 1.0-39
+
+ * hibiscus: Abruf der vorgemerkten Umsaetze aktivier-/deaktivierbar
+             (Parameter "umsatz.fetchnotbooked")
+ * hibiscus: Schalter "transfer.markexecuted.before", um festlegen zu
+             koennen, wann ein Auftrag als ausgefuehrt gilt (wenn die Quittung
+             von der Bank vorliegt oder wenn der Auftrag erzeugt wurde)
+ * hibiscus: Unterstuetzung von Auslandskonten in Adressbuch
+ * hibiscus: Spalte "empfaenger_konto" in Umsatz-Tabelle erweitert, damit
+             auch Auslandsbuchungen gespeichert werden koennen
+
+2009-02-12 Version 1.0-38
+
+ * hibiscus: hbci4java auf 2.5.10 (Snapshot SVN-HEAD, 2009-02-13) aktualisiert
+ * hibiscus: Update auf 1.10-nightly (Snapshot CVS-HEAD, 2009-02-13) aktualisiert
+             Darin enthalten sind alle Updates seit Hibiscus 1.9
+ * jameica:  Aktualisiert auf 1.8-nightly (Snapshot CVS-HEAD, 2009-02-13) aktualisiert
+
+2008-11-18 Version 1.0-35
+
+ * hibiscus: auf 2.5.9 aktualisiert
+ * jameica.soap, hibiscus.soap: SOAP-Connector hinzugefuegt
+ * hibiscus.server: beim Import eines RDH-Schluessels kann nun die
+   HBCI-Version explizit angegeben werden

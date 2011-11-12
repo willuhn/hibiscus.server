@@ -1,0 +1,16 @@
+table.inner {
+  width                   : 100%;
+}
+
+table.inner th {
+  text-align              : left;
+  font-weight             : bold;
+  background              : none;
+  color                   : #000000;
+  padding                 : 1px;
+}
+
+span.comment {
+  color                   : #909090;
+  font-size               : 7.5pt;
+}

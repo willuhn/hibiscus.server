@@ -1,0 +1,45 @@
+=== Hinweise zur Datei wrapper.conf ===
+
+Die Datei "wrapper.conf" kann zusammen mit der Windows-Software "wrapper" (Download
+unter http://wrapper.tanukisoftware.org/doc/english/download.jsp) verwendet werden,
+um den Hibiscus Payment-Server unter Windows als Dienst laufen zu lassen.
+
+
+=== Installationsanleitung ===
+
+1) Installiere den die Wrapper-Software in C:\Programme\wrapper
+
+2) Kopiere die beiliegende Config-Datei "wrapper.conf" nach
+   C:\Programme\wrapper\conf und ersetze damit die Standard-Konfiguration
+   des Programms.
+
+3) Entpacke den Hibiscus Payment-Server im Verzeichnis C:\Programme.
+   Hierbei wird ein Unterverzeichnis "hibiscus-server" angelegt.
+
+4) Oeffne die Config-Datei C:\Programme\wrapper\conf\wrapper.conf
+   in einem Text-Editor. Passe hierbei folgende Parameter an:
+
+   wrapper.app.parameter.4=jameica
+
+   Ersetze "jameica" gegen das verwendete Jameica Masterpasswort.
+
+5) Teste den korrekten Start des Servers durch Aufruf der Batch-Datei
+   C:\Programme\wrapper\bin\TestWrapper.bat
+
+6) Wenn der Server korrekt gestartet werden konnte, kannst Du ihn als Windows-Dienst
+   einrichten. Starte hierzu einfach die Batch-Datei InstallTestWrapper-NT.bat.
+   Du findest den Dienst nun im Menupunkt "Dienste" der "Computerverwaltung" von Windows.
+   Der Payment-Server wird nun automatisch beim Windows-Start - noch vor einem
+   Benutzerlogin - gestartet.
+
+
+=== Hinweis ===
+
+Der Hibiscus Payment-Server wird hierbei mit der Benutzerkennung des Users "Default User"
+ausgefuehrt. Das Jameica-Arbeitsverzeichnis ".jameica" findest Du daher in dessen
+Benutzerverzeichnis.
+
+
+=== Dank ===
+
+Vielen Dank an Jürgen Weiss für die Bereitstellung der Config-Datei.

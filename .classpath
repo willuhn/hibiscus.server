@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jameica"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jameica.webadmin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jameica.sensors"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus.xmlrpc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jameica.xmlrpc"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

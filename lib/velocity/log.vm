@@ -1,0 +1,12 @@
+#parse("includes/header.vm")
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="log.html">System-Log</a>
+</div>
+
+#set($height = "70%")
+#parse("includes/log.vm")
+
+#parse("includes/footer.vm")

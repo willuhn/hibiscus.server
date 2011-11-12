@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<webtools xmlns:wt="http://www.willuhn.de/schema/jameica-webtools"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.willuhn.de/schema/jameica-webtools http://www.willuhn.de/schema/jameica-webtools-1.0.xsd ">
+
+  <!-- Global verfuegbare Beans -->
+  <beans>
+    <bean name="meta"      class="de.willuhn.jameica.hbci.payment.web.beans.Meta" />
+    <bean name="message"   class="de.willuhn.jameica.hbci.payment.web.beans.Message" />
+    <bean name="protokoll" class="de.willuhn.jameica.hbci.payment.web.beans.Protokoll" />
+    <bean name="jobs"      class="de.willuhn.jameica.hbci.payment.web.beans.Jobs" />
+    <bean name="format"    class="de.willuhn.jameica.hbci.payment.web.beans.Format" />
+    <bean name="chart"     class="de.willuhn.jameica.hbci.payment.web.beans.Chart" />
+  </beans>
+
+  <!-- Die konkreten Pages -->
+  <pages>
+    <page pattern="^/settings.html"         template="settings.vm"         controller="de.willuhn.jameica.hbci.payment.web.beans.Settings"/>
+    <page pattern="^/passports.html"        template="passports.vm"        controller="de.willuhn.jameica.hbci.payment.web.beans.Passports" />
+    <page pattern="^/passports.pintan.html" template="passports.pintan.vm" controller="de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan" action="load" />
+    <page pattern="^/passports.rdh.html"    template="passports.rdh.vm"    controller="de.willuhn.jameica.hbci.payment.web.beans.PassportsRdh" action="store" />
+    <page pattern="^/passports.ddv.html"    template="passports.ddv.vm"    controller="de.willuhn.jameica.hbci.payment.web.beans.PassportsDdv" action="load" />
+    <page pattern="^/accounts.html"         template="accounts.vm"         controller="de.willuhn.jameica.hbci.payment.web.beans.Accounts" />
+    <page pattern="^/account.html"          template="account.vm"          controller="de.willuhn.jameica.hbci.payment.web.beans.Account" action="load" />
+
+    <page pattern="^/log.html"              template="log.vm" />
+    
+    <!-- Default-Seite -->
+    <page pattern=".*"                      template="index.vm"            controller="de.willuhn.jameica.hbci.payment.web.beans.Welcome" />
+  </pages>
+  
+  
+</webtools>

@@ -1,0 +1,246 @@
+#parse("includes/header.vm")
+
+<style>
+  div.handlerhidden {
+    visibility: hidden;
+    display: none;
+  }
+  div.handlervisible {
+    visibility: visible;
+    display: block;
+  }
+</style>
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+  &raquo;
+  <a href="passports.pintan.html">$c.name</a>
+</div>
+
+<h2>$c.name</h2>
+
+<form method="post" name="form1">
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="config" value="$format.escapePath($c.currentConfig.filename)">
+
+  <h3>Vorhandene PIN/TAN-Konfigurationen</h3>
+
+  <table class="data">
+    <tr>
+      <th>Bezeichnung</th>
+      <th>URL</th>
+      <th>Zugeordnete Konten</th>
+      <th>Aktion</th>
+    </tr>
+  
+    #set($list = $c.configs)
+    #if($list.size() > 0)
+      #foreach($p in $list)
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+          <td>$p.bezeichnung</td>
+          <td>$p.getURL()</td>
+          <td>
+            <table class="inner">
+              <tr>
+                <th>Name</th>
+                <th>Kontonummer</th>
+                <th style="text-align:right">Saldo</th>
+              </tr>
+              #foreach($k in $p.konten)
+                <tr>
+                  <td>$k.bezeichnung</td>
+                  <td>$k.kontonummer</td>
+                  <td style="text-align:right">$format.getSaldoText($k)</td>
+                </tr>
+              #end
+            </table>
+          </td>
+          <td>
+            <a title="Konfiguration bearbeiten" href="javascript:doEdit('$format.escapePath($p.filename)')"><img src="img/open.png" width="16" height="16" border="0" style="margin-right: 5px">Öffnen...</a>
+            <br/>
+            <a title="Liste der zugeordneten Konten aktualisieren" href="javascript:doUpdate('$format.escapePath($p.filename)')"><img src="img/view-refresh.png" width="16" height="16" border="0" style="margin-right: 5px">Konten aktualisieren</a>
+            <br/>
+            <a title="Konfiguration löschen"    href="javascript:doDelete('$format.escapePath($p.filename)')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
+          </td>
+        </tr>
+      #end
+    #else
+      <tr><td colspan="4">Keine PIN/TAN-Konfigurationen vorhanden, bitte lege zuerst eine neue PIN/TAN-Konfiguration an.</td></tr>
+    #end
+  </table>
+
+
+  
+ 
+  #if($c.currentConfig)
+    <h3>PIN/TAN-Konfiguration bearbeiten</h3>
+    [<a href="passports.pintan.html">Neue Konfiguration anlegen...</a>]
+  #else
+    <h3>Neue PIN/TAN-Konfiguration anlegen</h3>
+  #end
+
+  <table class="data">
+    <tr>
+      <th style="width:120px">Name</th>
+      <th>Wert</th>
+    </tr>
+    <tr>
+      <td>Bezeichnung</td>
+      <td>
+        <input type="text" name="bezeichnung" value="$!c.currentConfig.bezeichnung">
+        <span class="comment">frei wählbar. Z.Bsp.: "Geschäftskonto"</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Benutzerkennung</td>
+      <td><input type="text" name="benutzerkennung" value="$!c.currentConfig.customerId" #if($c.currentConfig)readonly#end></td>
+    </tr>
+    <tr>
+      <td>Kundenkennung</td>
+      <td>
+        <input type="text" name="kundenkennung" value="$!c.currentConfig.userId" #if($c.currentConfig)readonly#end>
+        <span class="comment">meist identisch mit Benutzerkennung</span>
+      </td>
+    </tr>
+    <tr>
+      <td>BLZ</td>
+      <td><input type="text" name="blz" value="$!c.currentConfig.getBLZ()" #if($c.currentConfig)readonly#end></td>
+    </tr>
+    <tr>
+      <td>HTTPS-URL</td>
+      <td>
+        <input type="text" name="url" value="$!c.currentConfig.getURL()" #if($c.currentConfig)readonly#end>
+        <span class="comment">Angabe ohne "https://", z.Bsp.: "hbci.finanzit.com/cgi/hbcipt.cgi"</span>
+      </td>
+    </tr>
+    <tr>
+      <td>HBCI-Version</td>
+      <td>
+        <select name="version">
+          #set($v = $c.currentConfig.getHBCIVersion())
+          <option value="201" #if($v && $v == "201")selected#end>HBCI 2.01</option>
+          <option value="210" #if($v && $v == "210")selected#end>HBCI 2.1</option>
+          <option value="220" #if($v && $v == "220")selected#end>HBCI 2.2</option>
+          <option value="plus" #if($v && $v == "plus")selected#end>HBCI+ (HBCI 2.2 mit PIN/TAN-Unterstützung)</option>
+          <option value="300" #if($v && $v == "300")selected#end>FinTS 3.0</option>
+        </select>
+        <span class="comment">meist HBCI+</span>
+      </td>
+    </tr>
+    <tr>
+      <td>PIN</td>
+      <td>
+        <input type="password" name="pin">
+        #if($c.currentConfig)
+          <span class="comment">freilassen, wenn die PIN nicht geändert werden soll</span>
+        #end
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space:nowrap">PIN (Wiederholung)</td>
+      <td>
+        <input type="password" name="pin2">
+        #if($c.currentConfig)
+          <span class="comment">freilassen, wenn die PIN nicht geändert werden soll</span>
+        #end
+      </td>
+    </tr>
+
+    <tr>
+      <td>TAN-Handler</td>
+      <td>
+        <select name="tanhandler" onchange="activateHandlerDetails(this.options[this.selectedIndex].value)">
+          <option value="">[kein TAN-Handler]</option>
+          #foreach($h in $c.tanHandlers)
+            <option #if($c.isCurrentTanHandler($h))selected#end value="$h.class.name">$h.name</option>
+          #end
+        </select>
+      
+        #foreach($h in $c.tanHandlers)
+          <div id="$h.class.name" class="handlerhidden">
+            <table>
+              #foreach($p in $h.parameters)
+                <tr>
+                  <td style="white-space:nowrap">$p.name</td>
+                  <td>
+                    <input type="text" name="${h.class.name}.${p.id}" value="$!p.value">
+                  </td>
+                  <td>
+                    #if($p.description)
+                      <span class="comment">$p.description</span>
+                    #end
+                  </td>
+                </tr>
+              #end
+            </table>
+          </div>
+        #end
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><input type="submit" onclick="document.form1.action.value='store'" value="Speichern..."></td>
+    </tr>
+  </table>
+</form>
+
+<script type="text/javascript">
+
+  var oldName = initHandler();
+  
+  function initHandler()
+  {
+    var v = document.form1.tanhandler.options[document.form1.tanhandler.selectedIndex].value;
+    activateHandlerDetails(v);
+    return v;
+  }  
+
+  function doEdit(v)
+  {
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+  
+  function doUpdate(v)
+  {
+    document.form1.elements.action.value = "update";
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+
+  function doDelete(v)
+  {
+    if (!window.confirm("Sicher?\n" +
+                        "Hierbei wird nur die PIN/TAN-Konfiguration gelöscht.\n" +
+                        "Die Konten, Umsätze und Aufträge bleiben erhalten."))
+      return;
+    document.form1.elements.action.value = "delete";
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+
+  function activateHandlerDetails(name)
+  {
+    // Ausblenden
+    if (oldName)
+    {
+      var element = document.getElementById(oldName);
+      if (element)
+      {
+        element.className = "handlerhidden";
+      }
+    }
+
+    // Einblenden
+    var element = document.getElementById(name);
+    if (element)
+    {
+      element.className = "handlervisible";
+      oldName = name;
+    }
+  }
+</script>
+
+#parse("includes/footer.vm")

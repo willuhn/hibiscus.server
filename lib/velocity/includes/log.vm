@@ -1,0 +1,39 @@
+<style>
+    table.data tr.DEBUG td {
+      color                    : #46824A;
+    }
+    table.data tr.INFO td {
+      color                    : #46824A;
+    }
+    table.data tr.WARN td {
+      color                    : #5770B2;
+    }
+    table.data tr.ERROR td {
+      color                    : #6E1416;
+      background               : #FFAC95;
+    }
+</style>
+
+<h2>System-Log</h2>
+#set($_height = "180px")
+#if($height)
+  #set($_height = $height)
+#end
+  
+<div style="border: 1px solid #a5a5a5; height:${_height};overflow:auto; overflow-y:auto;overflow-x:hidden">
+  <table class="data" style="border:none; margin:0px;padding:0px;">
+    <tr>
+      <th>Datum</th>
+      <th>Quelle</th>
+      <th>Text</th>
+    </tr>
+
+    #foreach($line in $message.log)
+      <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="${line.get("level")}">
+        <td style="white-space:nowrap;">${line.get("date")}</td>
+        <td><pre>${line.get("class")}</pre></td>
+        <td><pre>${line.get("text")}</pre></td>
+      </tr>
+    #end
+  </table>
+</div>

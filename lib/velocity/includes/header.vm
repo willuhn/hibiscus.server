@@ -1,0 +1,17 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+  <head>
+    <title>Hibiscus Management Console $meta.version</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="/webadmin/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="/hibiscus/css/styles.css">
+    <script language="JavaScript" src="/webadmin/js/common.js" type="text/javascript"></script>
+  </head>
+  
+  <body>
+  
+    <div>
+      <div style="background-position: 0px 15px; background-image: url('/hibiscus/img/hibiscus.gif'); height:65px; background-repeat: no-repeat;"></div>
+      <h1>Hibiscus Management Console</h1>
+      

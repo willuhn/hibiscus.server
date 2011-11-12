@@ -1,0 +1,177 @@
+#parse("includes/header.vm")
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+  &raquo;
+  <a href="passports.ddv.html">$c.name</a>
+</div>
+
+<h2>$c.name</h2>
+
+<form method="post" name="form1">
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="config" value="$!c.currentConfig.id">
+
+
+  <h3>Vorhandene Kartenleser-Konfigurationen</h3>
+
+  <table class="data">
+    <tr>
+      <th>Bezeichnung</th>
+      <th>Kartenleser</th>
+      <th>Zugeordnete Konten</th>
+      <th>Aktion</th>
+    </tr>
+  
+    #set($list = $c.configs)
+    #if($list.size() > 0)
+      #foreach($p in $list)
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+          <td>$p.name</td>
+          <td>$p.readerPreset</td>
+          <td>
+            <table class="inner">
+              <tr>
+                <th>Name</th>
+                <th>Kontonummer</th>
+                <th style="text-align:right">Saldo</th>
+              </tr>
+              #foreach($k in $p.konten)
+                <tr>
+                  <td>$k.bezeichnung</td>
+                  <td>$k.kontonummer</td>
+                  <td style="text-align:right">$format.getSaldoText($k)</td>
+                </tr>
+              #end
+            </table>
+          </td>
+          <td>
+            <a title="Konfiguration bearbeiten" href="javascript:doEdit('$p.id')"><img src="img/open.png" width="16" height="16" border="0" style="margin-right: 5px">Öffnen...</a>
+            <br/>
+            <a title="Konfiguration löschen"    href="javascript:doDelete('$p.id')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
+          </td>
+        </tr>
+      #end
+    #else
+      <tr><td colspan="5">Keine Kartenleser-Konfigurationen vorhanden, bitte lege zuerst eine neue Konfiguration an.</td></tr>
+    #end
+  </table>
+    
+  #if($c.currentConfig)
+    <h3>Konfiguration bearbeiten</h3>
+    [<a href="passports.ddv.html">Neue Konfiguration anlegen...</a>]
+  #else
+    <h3>Neue Konfiguration anlegen</h3>
+  #end
+    
+  <table class="data">
+    <tr>
+      <th>Name</th>
+      <th>Wert</th>
+    </tr>
+    <tr>
+      <td>Bezeichnung</td>
+      <td>
+        <input type="text" name="name" value="$!c.currentConfig.name">
+        <span class="comment">frei wählbar. Z.Bsp.: "Geschäftskonto"</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Modell</td>
+      <td>
+        <select name="reader">
+          #set($current = $c.currentCconfig.readerPreset.class.name)
+          #foreach($r in $c.readers)
+            <option value="$r.class.name" #if($current && $current == $r.class.name)selected#end>$r.name</option>
+          #end
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Port</td>
+      <td>
+        <select name="port">
+          #set($current = $c.currentConfig.port)
+          #foreach($p in $c.ports)
+            <option value="$p" #if($current && $current == $p)selected#end>$p</option>
+          #end
+        </select>
+        <span class="comment">meist COM/USB</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Index des Lesers</td>
+      <td>
+        <select name="ctnumber">
+          #set($current = $c.currentConfig.getCTNumber())
+          #foreach($i in [0..5])
+            <option value="$i" #if($current && $current == $i)selected#end>$i</option>
+          #end
+        </select>
+        <span class="comment">meist 0</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Index des HBCI-Zugangs auf der Chipkarte</td>
+      <td>
+        <select name="entryindex">
+          #set($current = $c.currentConfig.entryIndex)
+          #foreach($i in [1..5])
+            <option value="$i" #if($current && $current == $i)selected#end>$i</option>
+          #end
+        </select>
+        <span class="comment">meist 1</span>
+      </td>
+    </tr>
+    <tr>
+      <td>HBCI-Version</td>
+      <td>
+        <select name="hbciversion">
+          #set($v = $c.currentConfig.getHBCIVersion())
+          <option value="201" #if($v && $v == "201")selected#end>HBCI 2.01</option>
+          <option value="210" #if($v && $v == "210")selected#end>HBCI 2.1</option>
+          <option value="220" #if($v && $v == "220")selected#end>HBCI 2.2</option>
+          <option value="plus" #if($v && $v == "plus")selected#end>HBCI+ (HBCI 2.2 mit PIN/TAN-Unterstützung)</option>
+          <option value="300" #if($v && $v == "300")selected#end>FinTS 3.0</option>
+        </select>
+        <span class="comment">meist HBCI 2.1</span>
+      </td>
+    </tr>
+    <tr>
+      <td>PIN der Chipkarte</td>
+      <td><input type="password" name="pin"></td>
+    </tr>
+    <tr>
+      <td>PIN der Chipkarte (Wiederholung)</td>
+      <td><input type="password" name="pin2"></td>
+    </tr>
+  	<tr>
+  		<td>&nbsp;</td>
+  		<td><input type="submit" onclick="document.form1.action.value='store'" value="Speichern..."></td>
+  	</tr>
+  </table>
+</form>
+
+<script type="text/javascript">
+
+  function doEdit(v)
+  {
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+  
+  function doDelete(v)
+  {
+    if (!window.confirm("Sicher?\n" +
+                        "Hierbei wird nur die Kartenleser-Konfiguration gelöscht.\n" +
+                        "Die Konten, Umsätze und Aufträge bleiben erhalten."))
+      return;
+    document.form1.elements.action.value = "delete";
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+</script>
+
+#parse("includes/footer.vm")

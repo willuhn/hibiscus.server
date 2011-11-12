@@ -1,0 +1,62 @@
+#parse("includes/header.vm")
+
+<style>
+    table.data td.syncstatus-false {
+       color: #a0a0a0;
+    }
+    table.data td.syncstatus-true {
+    }
+</style>
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="accounts.html">Konten verwalten</a>
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+
+      <h2>Konten</h2>
+      
+      <table class="data">
+        <tr>
+          <th>Name</th>
+          <th>Institut/BLZ</th>
+          <th>Kontonummer</th>
+          <th>Medium</th>
+          <th>Sync.</th>
+          <th style="text-align:right">Saldo</th>
+          <th>Aktion</th>
+        </tr>
+        
+        #set($accounts = $c.accounts)
+        #if($accounts.size() > 0)
+          #foreach($a in $accounts)
+            #set($passport = $c.getPassport($a))
+            #set($sync     = $c.getOptions($a).synchronize)
+            <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="syncstatus-$sync">
+              <td class="syncstatus-$sync">$a.bezeichnung</td>
+              <td class="syncstatus-$sync">$format.getInstitut($a.getBLZ())</td>
+              <td class="syncstatus-$sync">$a.kontonummer</td>
+              <td class="syncstatus-$sync">#if($passport) $passport.name #else - #end</td>
+              <td class="syncstatus-$sync">#if($sync) ja #else nein #end</td>
+              <td class="syncstatus-$sync" style="text-align:right">$format.getSaldoText($a)</td>
+              <td><a href="account.html?id=$a.getID()"><img src="img/open.png" width="16" height="16" border="0" style="margin-right: 5px" align="left">Öffnen...</a></td>
+            </tr>
+          #end
+        #else
+          <tr><td colspan="7">Keine Konten vorhanden, bitte richte zuerst ein <a href="passports.html">HBCI-Sicherheitsmedium</a> ein</td></tr>
+        #end
+      </table>
+
+    </td>
+    <td style="padding-left: 20px;width:300px">
+      <h2>Saldo-Charts</h2>
+      <a href="/sensors/charts?device=hibiscus.server.device&group=hibiscus.server.device.accounts"><img src="/sensors/chart?device=hibiscus.server.device&group=hibiscus.server.device.accounts&from=${chart.month}" border="0"></a>      
+    </td>
+  </tr>
+</table>
+
+#parse("includes/footer.vm")

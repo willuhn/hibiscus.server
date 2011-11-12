@@ -1,0 +1,148 @@
+#parse("includes/header.vm")
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="accounts.html">Konten verwalten</a>
+  &raquo;
+  <a href="account.html?id=$c.account.getID()">Konto-Details</a>
+</div>
+
+<script type="text/javascript">
+  
+  function doDelete(v)
+  {
+    var check = window.prompt("Wirklich sicher?\n" +
+                        "Hierbei werden auch alle Umsätze und Auftäge dieses\n" + 
+                        "Kontos unwiderruflich gelöscht.\n\n" +
+                        "Bestätige den Löschvorgang bitte durch Eingabe von 'ja'\n" +
+                        "in diesem Eingabefeld:");
+    if (!check || check != "ja")
+      return;
+      
+    document.form1.elements.action.value = "delete";
+    document.form1.submit();
+  }
+
+</script>
+
+#if($c.account)
+  
+  <form method="post" name="form1">
+    <input type="hidden" name="action" value="">
+
+    #set($options = $c.options)
+    <table style="width:100%">
+      <tr>
+        <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+          <h2>Synchronisierungseinstellungen</h2>
+          
+        
+            <table class="data">
+              <tr><th>Geschäftsvorfall</th></tr>
+              <tr><td><input type="checkbox" name="saldo"   value="1" #if($options.syncSaldo) checked #end> Saldo abrufen</td></tr>
+              <tr><td><input type="checkbox" name="umsatz"  value="1" #if($options.syncKontoauszuege) checked #end> Kontoauszüge (Umsätze) abrufen</td></tr>
+              <tr><td><input type="checkbox" name="ueb"     value="1" #if($options.syncUeberweisungen) checked #end> Überfällige Überweisungen absenden</td></tr>
+              <tr><td><input type="checkbox" name="last"    value="1" #if($options.syncLastschriften) checked #end> Überfällige Lastschriften einziehen</td></tr>
+              <tr><td><input type="checkbox" name="foreign" value="1" #if($options.syncAuslandsUeberweisungen) checked #end> Überfällige SEPA-Überweisungen absenden</td></tr>
+              <tr><td><input type="checkbox" name="dauer"   value="1" #if($options.syncDauerauftraege) checked #end> Daueraufträge synchronisieren</td></tr>
+              <tr>
+                <td><input type="submit" onclick="document.form1.action.value='store'" value="Speichern"></td>
+              </tr>
+            </table>
+            
+        </td>
+        <td style="padding-left: 20px;width:300px">
+          <h2>Konto-Details</h2>
+          <table class="data">
+            <tr>
+              <th>Name</th>
+              <th>Wert</th>
+            </tr>
+            <tr>
+              <td>Bezeichnung</td>
+              <td>$c.account.bezeichnung</td>
+            </tr>
+            <tr>
+              <td>Kontonummer / BLZ</td>
+              <td>$c.account.kontonummer / $c.account.getBLZ() </td>
+            </tr>
+            <tr>
+              <td>Institut</td>
+              <td>$format.getInstitut($c.account.getBLZ()) </td>
+            </tr>
+            <tr>
+              <td>Saldo</td>
+              <td>$format.getSaldoText($c.account)</td>
+            </tr>
+          </table>
+  
+          <h2>Saldo-Chart</h2>
+          <a href="/sensors/charts?device=hibiscus.server.device&group=hibiscus.server.device.accounts&sensor=hibiscus.server.device.accounts.${c.account.checksum}"><img src="/sensors/chart?device=hibiscus.server.device&group=hibiscus.server.device.accounts&sensor=hibiscus.server.device.accounts.${c.account.checksum}&from=${chart.month}" border="0"></a>
+
+          <h2>Aufgaben</h2>
+          <ul class="navi">
+            <li><a title="Konto löschen" href="javascript:doDelete()"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Konto löschen...</a></li>
+          </ul>
+            
+        </td>
+      </tr>
+    </table>
+  </form>
+
+  
+  <h3>Letzte Umsätze</h3>
+
+  <div style="border: 1px solid #a5a5a5; max-height:180px;overflow:auto; overflow-y:auto;overflow-x:hidden">
+    <table class="data" style="border:none; margin:0px;padding:0px;">
+      <tr>
+        <th>Gegenkonto</th>
+        <th>Zweck</th>
+        <th>Datum</th>
+        <th>Valuta</th>
+        <th style="text-align:right">Betrag</th>
+        <th style="text-align:right">Saldo</th>
+      </tr>
+      #foreach($u in $c.getUmsaetze())
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+          <td>$!u.getAttribute("empfaenger")</td>
+          <td>$!u.zweck</td>
+          <td>$format.getDatum($u.datum)</td>
+          <td>$format.getDatum($u.valuta)</td>
+          <td style="text-align:right">$format.getBetrag($u.betrag)</td>
+          <td style="text-align:right">$format.getBetrag($u.saldo)</td>
+        </tr>
+      #end
+    </table>
+  </div>
+
+
+  <h3>Letzte Zeilen des Ereignis-Protokolls</h3>
+  <style>
+    /* Log-Levels einfaerben */
+    table.data tr.type-$protokoll.success td {
+      color     : #46824A;
+    }
+    table.data tr.type-$protokoll.error td {
+      color     : #6E1416;
+      background: #FFAC95;
+    }
+  </style>
+
+  <div style="border: 1px solid #a5a5a5; max-height:180px;overflow:auto; overflow-y:auto;overflow-x:hidden">
+    <table class="data" style="border:none; margin:0px;padding:0px;">
+      <tr>
+        <th>Datum</th>
+        <th>Kommentar</th>
+      </tr>
+      #foreach($p in $c.getProtokoll())
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="type-$p.typ">
+          <td style="white-space: nowrap"><pre>$format.getLongDatum($p.datum)</pre></td>
+          <td><pre>$p.kommentar</pre></td>
+        </tr>
+      #end
+    </table>
+  </div>
+#end
+
+#parse("includes/footer.vm")

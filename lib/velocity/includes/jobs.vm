@@ -1,0 +1,30 @@
+#set($joblist = $jobs.jobs)
+
+#if($joblist)
+  <h2>Anstehende HBCI-Aufträge</h2>
+	<table class="data">
+    <tr>
+      <th>Bezeichnung</th>
+    </tr>
+    #foreach($j in $joblist)
+      <tr>
+        #if($j.recurring)
+          <td>$j.name</td>
+        #else
+          <td><b>$j.name</b></td>
+        #end
+      </tr>
+    #end
+  </table>
+
+  #if(!$jobs.nextExecution)
+    <div class="note">
+      Die Geschäftsvorfälle werden <b>nicht</b> automatisch ausgeführt, da der
+      Scheduler-Service gestoppt wurde.
+    </div>
+  #end
+
+#else
+  <h2>Keine anstehenden HBCI-Aufträge</h2>
+#end
+

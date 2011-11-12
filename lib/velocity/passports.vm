@@ -1,0 +1,42 @@
+#parse("includes/header.vm")
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+
+      <h2>HBCI-Sicherheitsmedien</h2>
+      
+      <table class="data">
+        <tr>
+          <th>Bezeichnung</th>
+          <th>Bemerkung</th>
+          <th>Aktion</th>
+        </tr>
+        #foreach($p in $c.passports)
+          <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+            <td>$p.name</td>
+            <td>$p.info</td>
+            <td><a title="Öffnen" href="$c.getLink($p)"><img src="img/open.png" width="16" height="16" border="0" style="margin-right: 5px">Öffnen...</a></td>
+          </tr>
+        #end
+      </table>
+    </td>
+    <td style="padding-left: 20px;width:300px">
+      <h2>Hinweise</h2>
+      
+      <span class="comment">
+        Wähle bitte das gewünschte HBCI-Sicherheitsmedium aus.
+        Nach erfolgreicher Anlage der Zugangs-Konfiguration werden die
+        zugeordneten Konten automatisch erstellt.
+      </span>
+    </td>
+  </tr>
+</table>
+
+#parse("includes/footer.vm")

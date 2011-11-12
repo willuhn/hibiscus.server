@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ $Revision: 1.1 $
+ $Date: 2011/11/12 15:09:59 $
+ $Author: willuhn $
+ 
+ Copyright (c) by willuhn software & services
+ All rights reserved
+ 
+ Build-Script, um die komplette Server-Distribution des Payment-Servers
+ zu erstellen. Es erstellt ein bz2-Archiv mit Jameica und den Plugins:
+ 
+ - jameica.webadmin
+ - jameica.xmlrpc
+ - jameica.soap
+ - jameica.sensors
+ - hibiscus
+ - hibiscus.xmlrpc
+ - hibiscus.soap
+ - hibiscus.server
+-->
+
+<project basedir=".." default="all" name="All">
+
+	<target name="init" description="inits the build">
+    <loadproperties srcfile="build/build.properties"/>
+    <xmlproperty file="plugin.xml" collapseattributes="true"/>
+
+    <!-- create cvs tag -->
+    <propertyfile file="build/TAG">
+      <entry key="mytag" value="${plugin.version}" />
+    </propertyfile>
+    <replaceregexp flags="g" file="build/TAG" match="\." replace="_" />
+    <loadproperties srcFile="build/TAG"/>
+    <delete file="build/TAG" />
+    <property name="tag" value="HIBISCUS_SERVER_${mytag}" />
+		
+		<property name="release.filename"    value="${define.server.name}-${plugin.version}.zip" />
+
+    <echo message="VERSION: ${plugin.version}" />
+    <echo message="CVS-Tag: ${tag}" />
+    <echo message="JAVA   : ${java.version}" />
+	</target>
+
+	<target name="build" depends="init" description="build the modules">
+		<ant antfile="../jameica/build/build.xml"          target="zip"     inheritall="false" /> <!-- Jameica signiert immer, daher nur "zip" noetig //-->
+    <ant antfile="../jameica.webadmin/build/build.xml" target="signzip" inheritall="false" />
+    <ant antfile="../jameica.xmlrpc/build/build.xml"   target="signzip" inheritall="false" />
+    <ant antfile="../jameica.soap/build/build.xml"     target="signzip" inheritall="false" />
+    <ant antfile="../jameica.sensors/build/build.xml"  target="signzip" inheritall="false" />
+
+		<ant antfile="../hibiscus/build/build.xml"         target="signzip" inheritall="false" />
+    <ant antfile="../hibiscus.xmlrpc/build/build.xml"  target="signzip" inheritall="false" />
+    <ant antfile="../hibiscus.soap/build/build.xml"    target="signzip" inheritall="false" />
+    <ant antfile="../hibiscus.server/build/build.xml"  target="signzip" inheritall="false" />
+	</target>
+
+  <target name="copy" depends="build" description="copy the modules">
+    <mkdir dir="releases/${define.server.name}"/>
+  	
+  	<!-- Jameica -->
+  	<unzip dest="releases/${define.server.name}">
+  		<fileset dir="../jameica/releases">
+  			<include name="**/jameica.zip"/>
+  	  </fileset>
+  	</unzip>
+  	<move todir="releases/${define.server.name}">
+      <fileset dir="releases/${define.server.name}/jameica">
+        <include name="**"/>
+      	<!-- Wir brauchen wenigstens einmal die swt.jar fuer den Classloader - auch wenn sie nicht genutzt werden -->
+        <exclude name="**/lib/swt/linux64/**"/>
+        <exclude name="**/lib/swt/macos*/**"/>
+        <exclude name="**/lib/swt/win64/**"/>
+
+      	<exclude name="**/lib/splash.jar"/>
+        <exclude name="**/lib/mckoi/**"/>
+      	
+        <exclude name="jameica*-win64*" />
+        <exclude name="jameica*-linux64*" />
+      	<exclude name="jameica*-macos*" />
+        <exclude name="jameica*-openbsd*" />
+        <exclude name="jameica*-osol*" />
+        <exclude name="*.exe" />
+        <exclude name="*.bat" />
+        <exclude name="jameica.sh" />
+        <exclude name="COPYING" />
+        <exclude name="README" />
+        <exclude name="*.plist" />
+        <exclude name="Jameica.icns" />
+        <exclude name="jameica-icon*" />
+      </fileset>
+    </move>
+  	<delete dir="releases/${define.server.name}/jameica"/>
+  	
+    <!-- jameica.webadmin -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../jameica.webadmin/releases">
+        <include name="**/jameica.webadmin.zip"/>
+      </fileset>
+    </unzip>
+    <!-- jameica.xmlrpc -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../jameica.xmlrpc/releases">
+        <include name="**/jameica.xmlrpc.zip"/>
+      </fileset>
+    </unzip>
+    <!-- jameica.soap -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../jameica.soap/releases">
+        <include name="**/jameica.soap.zip"/>
+      </fileset>
+    </unzip>
+    <!-- jameica.sensors -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../jameica.sensors/releases">
+        <include name="**/jameica.sensors.zip"/>
+      </fileset>
+    </unzip>
+    <!-- hibiscus -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../hibiscus/releases">
+        <include name="**/hibiscus.zip"/>
+      </fileset>
+    </unzip>
+    <!-- hibiscus.xmlrpc -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../hibiscus.xmlrpc/releases">
+        <include name="**/hibiscus.xmlrpc.zip"/>
+      </fileset>
+    </unzip>
+    <!-- hibiscus.soap -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../hibiscus.soap/releases">
+        <include name="**/hibiscus.soap.zip"/>
+      </fileset>
+    </unzip>
+    <!-- hibiscus.server -->
+    <unzip dest="releases/${define.server.name}/plugins">
+      <fileset dir="../hibiscus.server/releases">
+        <include name="**/hibiscus.server.zip"/>
+      </fileset>
+    </unzip>
+
+  	<!-- Config -->
+  	<copy todir="releases/${define.server.name}/cfg">
+  		<fileset dir="cfg" />
+    </copy>
+  		
+    <!-- Doku -->
+    <copy todir="releases/${define.server.name}">
+      <fileset dir="build">
+        <include name="ChangeLog"/>
+        <include name="COPYING"/>
+        <include name="jameicaserver.exe"/>
+      </fileset>
+    </copy>
+
+  </target>
+  
+  <target name="pack" depends="copy" description="create the archive">
+    <zip destfile="releases/${release.filename}">
+      <zipfileset prefix="${define.server.name}" dir="releases/${define.server.name}" filemode="755">
+        <include name="*.sh"/>
+        <include name="rcjameica"/>
+      </zipfileset>
+      <zipfileset prefix="${define.server.name}" dir="releases/${define.server.name}">
+        <include name="**"/>
+        <exclude name="*.sh"/>
+        <exclude name="rcjameica"/>
+      </zipfileset>
+    </zip>
+  </target>
+  
+  <target name="sign" depends="pack" description="signs the release">
+    <echo message="Creating checksum" />
+    <checksum format="MD5SUM" algorithm="SHA" file="releases/${release.filename}" />
+  
+    <echo message="Creating PGP signatures" />
+    <exec executable="gpg" failonerror="true" timeout="60000">
+      <arg line="-asb --use-agent releases/${release.filename}" />
+    </exec>
+  </target>
+	
+	<target name="cvs_commit" description="cvs commit">
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../jameica/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../jameica.webadmin/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../jameica.xmlrpc/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../jameica.soap/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../jameica.sensors/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../hibiscus/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../hibiscus.xmlrpc/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../hibiscus.soap/build" />
+    </antcall>
+    <antcall target="sub_cvs_commit">
+      <param name="param.dir" value="../hibiscus.server/build" />
+    </antcall>
+	</target>
+  
+  <target name="cvs_tag" description="cvs tag">
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../jameica" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../jameica.webadmin" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../jameica.xmlrpc" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../jameica.soap" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../jameica.sensors" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../hibiscus" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../hibiscus.xmlrpc" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../hibiscus.soap" />
+    </antcall>
+    <antcall target="sub_cvs_tag">
+      <param name="param.dir" value="../hibiscus.server" />
+    </antcall>
+  </target>
+
+	<target name="clean" description="cleanup">
+    <delete dir="../jameica/releases" />
+    <delete dir="../jameica.webadmin/releases" />
+    <delete dir="../jameica.xmlrpc/releases" />
+    <delete dir="../jameica.soap/releases" />
+    <delete dir="../jameica.sensors/releases" />
+    <delete dir="../hibiscus/releases" />
+    <delete dir="../hibiscus.xmlrpc/releases" />
+    <delete dir="../hibiscus.soap/releases" />
+    <delete dir="../hibiscus.server/releases/${define.server.name}" />
+  </target>
+
+  <target depends="init,build,copy,pack,sign,cvs_commit,cvs_tag,clean" description="build an official release" name="all" />
+  <target depends="init,build,copy,pack,sign,cvs_commit,clean" description="build inofficial release" name="fast" />
+
+  <target name="sub_cvs_commit">
+    <exec executable="cvs" failonerror="true" dir="${param.dir}">
+      <arg line="commit -m 'Hibiscus Payment-Server ${plugin.version}' BUILD" />
+    </exec>
+  </target>
+
+  <target name="sub_cvs_tag">
+    <exec executable="cvs" failonerror="true" dir="${param.dir}">
+      <arg line="tag ${tag}" />
+    </exec>
+  </target>
+
+</project>

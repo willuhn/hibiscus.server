@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<plugin name="hibiscus.server" version="2.1.0-beta" class="de.willuhn.jameica.hbci.payment.Plugin"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
+
+  <description>Hibiscus Payment-Server</description>
+  <url></url>
+  <homepage>http://www.willuhn.de/products/hibiscus-server</homepage>
+  <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
+
+  <requires jameica="2.0.0+">
+
+    <!-- Hibiscus selbst -->
+    <import plugin="hibiscus"         version="2.0.0+"/>
+
+    <!-- Plattform-Erweiterungen -->
+    <import plugin="jameica.webadmin" version="1.2"/>
+    <import plugin="jameica.xmlrpc"   version="1.1"/>
+    <import plugin="jameica.soap"     version="1.0"/>
+
+    <import plugin="jameica.sensors"  version="1.0" required="false" />
+
+    <!-- Hibiscus-Connectoren -->
+    <import plugin="hibiscus.xmlrpc"  version="1.2"/>
+    <import plugin="hibiscus.soap"    version="1.0"/>
+  </requires>
+
+  <classfinder>
+    <include>hibiscus\.server\.jar</include>
+    <include>.*\.class</include>
+  </classfinder>
+
+  <services>
+    <service name="execute"   depends=""        autostart="true"  class="de.willuhn.jameica.hbci.payment.rmi.ExecuteService" />
+    <service name="scheduler" depends="execute" autostart="true"  class="de.willuhn.jameica.hbci.payment.rmi.SchedulerService" />
+    <service name="tantest"   depends=""        autostart="false" class="de.willuhn.jameica.hbci.payment.rmi.TANTestService" />
+  </services>
+
+  <messaging>
+    <consumer queue="hibiscus.passport.rdh.hbciversion" class="de.willuhn.jameica.hbci.payment.messaging.QueryHBCIVersionMessageConsumer" />
+  </messaging>
+  
+</plugin>
+

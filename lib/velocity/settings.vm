@@ -1,0 +1,271 @@
+#parse("includes/header.vm")
+
+<div id="breadcrumbs">
+  <a href="/hibiscus/">Home</a>
+  &raquo;
+  <a href="settings.html">System-Einstellungen</a>
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+
+      <h2>System-Einstellungen</h2>
+      
+      <form method="post" name="settings">
+        <input type="hidden" name="action" value="storeSettings" />
+        <table class="data">
+          <tr>
+            <th>Name</th>
+            <th>Wert</th>
+          </tr>
+          <tr>
+            <td>Scheduler-Service für Synchronisierung im Fehlerfall stoppen.</td>
+            <td><input type="checkbox" onchange="updateForm()" name="stopSchedulerOnError" #if($c.stopSchedulerOnError) checked="checked" #end /></td>
+          </tr>
+          <tr>
+            <td>Intervall der Synchronisierung</td>
+            <td><input type="text" name="schedulerInterval" value="$c.schedulerInterval" /> Minuten</td>
+          </tr>
+          <tr>
+            <td>Synchronisierung aussetzen an folgenden Wochentagen</td>
+            <td>
+              <input type="checkbox" name="schedulerExcludeMon" #if($c.schedulerExcludeMon) checked="checked" #end /> Montag<br/>
+              <input type="checkbox" name="schedulerExcludeTue" #if($c.schedulerExcludeTue) checked="checked" #end /> Dienstag<br/>
+              <input type="checkbox" name="schedulerExcludeWed" #if($c.schedulerExcludeWed) checked="checked" #end /> Mittwoch<br/>
+              <input type="checkbox" name="schedulerExcludeThu" #if($c.schedulerExcludeThu) checked="checked" #end /> Donnerstag<br/>
+              <input type="checkbox" name="schedulerExcludeFri" #if($c.schedulerExcludeFri) checked="checked" #end /> Freitag<br/>
+              <input type="checkbox" name="schedulerExcludeSat" #if($c.schedulerExcludeSat) checked="checked" #end /> Samstag<br/>
+              <input type="checkbox" name="schedulerExcludeSun" #if($c.schedulerExcludeSun) checked="checked" #end /> Sonntag<br/>
+            </td>
+          </tr>
+          <tr>
+            <td>Synchronisierung aussetzen in der Zeit von </td>
+            <td>
+              <select name="schedulerExcludeFrom">
+                #set($current = $c.schedulerExcludeFrom)
+                #foreach($hour in [0..23])
+                  <option value="$hour" #if($current == $hour)selected#end>$hour</option>
+                #end
+              </select>
+              bis
+              <select name="schedulerExcludeTo">
+                #set($current = $c.schedulerExcludeTo)
+                #foreach($hour in [0..23])
+                  <option value="$hour" #if($current == $hour)selected#end>$hour</option>
+                #end
+              </select> Uhr
+            </td>
+          </tr>
+          #if($jobs.nextExecution)
+            <tr>
+              <td>Nächster Start</td>
+              <td><b>$jobs.nextExecution</b></td>
+            </tr>
+          #end
+          <tr>
+            <td>Auftragslimit</td>
+            <td><input type="text" name="hbciJobLimit" value="$c.hbciJobLimit" /> $meta.currency</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="Speichern"></td>
+          </tr>
+        </table>
+      </form>
+      
+      
+      <h2>Benachrichtigungen</h2>
+
+      <form method="post" name="notify">
+        <input type="hidden" name="action" value="storeNotify" />
+        <input type="hidden" name="notifyEnabled" value="$c.notifyEnabled" />
+        <table class="data">
+          <tr>
+            <th>Name</th>
+            <th>Wert</th>
+          </tr>
+          <tr>
+            <td>URL nach erfolgreicher Synchronisierung aufrufen</td>
+            <td><input type="text" style="width:100%" name="notifyUrl" value="$!c.notifyUrl" /></td>
+          </tr>
+          <tr>
+            <td colspan="2">&nbsp;</td>
+          </tr>
+          <tr>
+            <td>Mail-Benachrichtigung im Fehlerfall</td>
+            <td><input type="checkbox" onchange="updateForm()" name="notify" #if($c.notifyEnabled) checked="checked" #end /></td>
+          </tr>
+          <tr>
+            <td>SMTP Hostname</td>
+            <td>
+              <input onkeyup="updateForm()" type="text" name="smtpHost" value="$!c.smtpHost" />
+              <span class="comment">kann frei bleiben, falls localhost</span>
+            </td>
+          </tr>
+          <tr>
+            <td>SMTP Username</td>
+            <td>
+              <input type="text" name="smtpUsername" value="$!c.smtpUsername" />
+              <span class="comment">falls notwendig</span>
+            </td>
+          </tr>
+          <tr>
+            <td>SMTP Password</td>
+            <td>
+              <input type="text" name="smtpPassword" value="$!c.smtpPassword" />
+              <span class="comment">falls notwendig</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Absender-Adresse</td>
+            <td>
+              <input type="text" name="mailSender" value="$!c.mailSender" />
+              <span class="comment">kann frei bleiben</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Empfänger-Adressen</td>
+            <td>
+              <input type="text" name="mailRecipients" value="$!c.mailRecipients" />
+              <span class="comment">Komma-getrennt</span>
+            </td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" name="send" onclick="document.notify.notifyEnabled.value=document.notify.notify.checked;document.notify.submit();" value="Speichern"></td>
+          </tr>
+        </table>
+      </form>
+
+      
+      <h2>XML-RPC Einstellungen</h2>
+
+      <form method="post" name="xmlrpc">
+        <input type="hidden" name="action" value="storeXmlrpc" />
+        <table class="data">
+          <tr>
+            <th style="text-align:center;width:5%">Aktiv?</th>
+            <th>Service</th>
+            <th>URL</th>
+          </tr>
+          #foreach($s in $c.xmlRpcServices)
+            <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+              <td style="text-align:center"><input type="checkbox" value="true" name="xmlrpc_$s.serviceName" #if($s.shared) checked="checked" #end /></td>
+              <td>$s.serviceName</td>
+              <td>$s.URL</td>
+            </tr>
+          #end
+          <tr>
+            <td colspan="3">&nbsp;</td>
+          </tr>
+          <tr>
+            <td colspan="2">Server-Verhalten von create/delete</td>
+            <td>
+              <select name="xmlRpcNullSupported">
+                <option value="true" #if($c.xmlRpcNullSupported) selected="selected" #end>bei Erfolg: return NULL, bei Fehler: return Fehlertext (default)</option>
+                <option value="false" #if(!$c.xmlRpcNullSupported) selected="selected" #end>bei Erfolg: return ID, bei Fehler: throw Exception</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">&nbsp;</td>
+            <td><input type="submit" name="send" onclick="document.xmlrpc.submit();" value="Speichern"></td>
+          </tr>
+        </table>
+      </form>
+      
+    </td>
+    <td style="padding-left: 20px;width:300px">
+      <h2>Hinweise</h2>
+      
+      <span class="comment">
+        <h3>System-Einstellungen</h3>
+        Wenn während der HBCI-Kommunikation mit der Bank ein Fehler auftritt, stoppt
+        der Payment-Server aus Sicherheitsgründen den Scheduler-Service. Kontrolliere
+        in diesem Fall bitte das <a href="log.html">System-Log</a> zur Klärung
+        der Fehler-Ursache. Starte anschließend den <a href="/hibiscus/?action=start">Scheduler-Service
+        neu</a>, um die automatische Ausführung von Geschäftsvorfällen wieder zu aktivieren.
+        Falls Du lediglich lesend auf die Konten zugreifen (Saldo- und Umsatzabruf) willst,
+        kannst Du die Option &quot;Scheduler-Service für Synchronisierung im Fehlerfall stoppen&quot;
+        auch deaktivieren.
+        
+        <br/><br/>
+        
+        Einige Banken führen nachts Buchungs- und Wartungsläufe durch, die HBCI-Server
+        sind während dieser Zeit nicht erreichbar. Mit der Option
+        &quot;Synchronisierung aussetzen in der Zeit von&quot; kannst Du den
+        Scheduler-Service entsprechend pausieren. Bei Bedarf kannst Du mit der Option
+        &quot;Synchronisierung aussetzen an folgenden Wochentagen&quot; auch ganze
+        Tage aussetzen.
+        
+        <br/><br/>
+
+        <h3>Benachrichtigungen</h3>
+        Im Feld &quot;URL nach erfolgreicher Synchronisierung aufrufen&quot; kannst Du die URL
+        eines Fremdsystems angeben, welches benachrichtigt werden soll, wenn die Synchronsisierung
+        eines Kontos erfolgreich durchgeführt wurde. Die angegebene URL wird mit einem HTTP-POST-
+        Request aufgerufen, die Eigenschaften des aktualisierten Kontos (incl. neuem Saldo)
+        werden im JSON-Format in einem Formularfeld mit dem Namen &quot;context&quot; übertragen.
+        <br/><br/>
+
+        Wenn Du die Option &quot;Scheduler-Service für Synchronisierung im Fehlerfall stoppenn&quot;
+        aktiviert hast, kannst Du eine Mail-Benachrichtigung einrichten, die Dich automatisch
+        informiert, wenn es zu einem Fehler gekommen ist.
+
+        <br/><br/>
+
+        <h3>XML-RPC-Einstellungen</h3>
+        Wenn Du via <a class="external" href="http://de.wikipedia.org/wiki/XML-RPC">XML-RPC</a> von
+        einem Fremd-System aus auf die Daten des Payment-Servers zugreifen möchtest (z.Bsp. für den
+        Zugriff auf die abgerufenen Kontoauszüge oder zum Anlegen neuer Überweisungen), dann aktiviere
+        die gewünschten Services. Im <a class="external" href="http://www.willuhn.de/doku.php?id=develop:xmlrpc#xml-rpc-aufrufe_im_detail">Hibiscus-Wiki</a>
+        findest Du detaillierte Beschreibungen der möglichen Aufrufe. Wenn Du keinen XML-RPC-Zugriff
+        benötigst, dann deaktiviere alle Services.
+        <br/><br/>
+        Mit der Option &quot;Server-Verhalten von create/delete&quot; kannst Du festlegen,
+        welche Rückgabe-Werte der Server liefern soll, wenn Zahlungsaufträge (z.Bsp. Überweisungen oder
+        Lastschriften) erstellt oder gelöscht werden. Per Default liefern die Aufrufe bei der erfolgreichen
+        Erstellung/Löschung eines Auftrages den Rückgabewert NULL (bzw. &quot;&lt;ex:nil/&gt;&quot;). Im Fehlerfall
+        wird ein String mit dem Fehlertext zurückgeliefert. Falls Du jedoch die ID des
+        Auftrages benötigst (z.Bsp. um ihn ggf. wieder löschen zu können) oder falls
+        die XML-RPC-Implementierung der von Dir verwendeten Programmiersprache keine NULL-Werte
+        unterstützt, kannst Du das Verhalten so ändern, dass bei der erfolgreichen Erstellung/Löschung
+        die ID des Auftrages zurückgeliefert und im Fehlerfall eine Exception (mit dem Fehlertext)
+        geworfen wird.
+      </span>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+
+  updateForm();
+  
+  function updateForm()
+  {
+    // Ist die Option zum Stoppen des Schedulers im Fehlerfall ueberhaupt aktiv?
+    var notifyPossible = document.settings.stopSchedulerOnError.checked;
+    
+    var f = document.notify;
+    var b = f.notify.checked && notifyPossible;
+    
+    // Nur wenn der Scheduler stoppen kann, macht es ueberhaupt Sinn, Benachrichtigungen zu senden.
+    f.notify.disabled = !notifyPossible;
+    f.notify.readOnly = !notifyPossible;
+
+    // Wenn die Benachrichtigungen nicht nur moeglich sondern auch aktiviert sind,
+    // aktivieren wir auch die anderen Felder.
+    f.smtpHost.disabled = !b;
+    f.smtpUsername.disabled = !b || f.smtpHost.value == '';
+    f.smtpPassword.disabled = !b || f.smtpHost.value == '';
+    f.mailSender.disabled = !b;
+    f.mailRecipients.disabled = !b;
+    
+    
+    
+    f.send.disabled = !notifyPossible;
+  }  
+</script>
+
+#parse("includes/footer.vm")
