@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!--
- $Revision: 1.1 $
- $Date: 2011/11/12 15:09:59 $
+ $Revision: 1.2 $
+ $Date: 2011/11/17 21:57:04 $
  $Author: willuhn $
 
  Copyright (c) by willuhn software & services
@@ -228,7 +228,6 @@
 
 		<copy file="${project.release}/${define.zipfilename}" tofile="${project.nightly}/${plugin.name}-${plugin.version}-nightly.zip" />
 		<copy file="${project.release}/${define.srcfilename}" tofile="${project.nightly}/${plugin.name}-${plugin.version}-nightly.src.zip" />
-		<copy file="${project.release}/${define.javadocfilename}" tofile="${project.nightly}/${plugin.name}-${plugin.version}-nightly.javadoc.zip" />
 
     <!-- Die Datei brauchen die anderen Plugins zum Kompilieren //-->
 	  <copy file="${project.zipdir}/${define.jarfilename}" tofile="releases/${plugin.name}-lib.jar" />
