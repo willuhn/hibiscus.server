@@ -261,10 +261,6 @@
     f.smtpPassword.disabled = !b || f.smtpHost.value == '';
     f.mailSender.disabled = !b;
     f.mailRecipients.disabled = !b;
-    
-    
-    
-    f.send.disabled = !notifyPossible;
   }  
 </script>
 
