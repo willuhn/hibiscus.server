@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/Settings.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
+ * $Revision: 1.2 $
+ * $Date: 2012/03/28 22:28:09 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -39,6 +39,7 @@ import de.willuhn.jameica.security.Wallet;
 import de.willuhn.jameica.security.crypto.AESEngine;
 import de.willuhn.jameica.security.crypto.Engine;
 import de.willuhn.jameica.security.crypto.RSAEngine;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
@@ -70,7 +71,9 @@ public class Settings
     String engineClass = settings.getString("wallet.engine",AESEngine.class.getName());
     try
     {
-      engine = (Engine) Application.getPluginLoader().getPlugin(Plugin.class).getResources().getClassLoader().load(engineClass).newInstance();
+      Class<Engine> ec = Application.getPluginLoader().getManifest(Plugin.class).getClassLoader().load(engineClass);
+      BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+      engine = (Engine) service.get(ec);
     }
     catch (Exception e)
     {
@@ -522,6 +525,10 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.2  2012/03/28 22:28:09  willuhn
+ * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
+ * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
+ *
  * Revision 1.1  2011/11/12 15:09:59  willuhn
  * @N initial import
  *
