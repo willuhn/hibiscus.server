@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/Settings.java,v $
- * $Revision: 1.2 $
- * $Date: 2012/03/28 22:28:09 $
+ * $Revision: 1.3 $
+ * $Date: 2012/06/03 13:47:45 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -104,6 +104,17 @@ public class Settings
         wallet.setEngine(new RSAEngine());
       }
     }
+  }
+  
+  /**
+   * Liefert true, wenn auf dem Webfrontend das Master-Passwort als
+   * Login abgefragt werden soll.
+   * @return true, wenn das Master-Passwort abgefragt werden soll.
+   * Per Default: true.
+   */
+  public static boolean isLoginEnabled()
+  {
+    return settings.getBoolean("web.login.enabled",true);
   }
   
   /**
@@ -525,6 +536,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.3  2012/06/03 13:47:45  willuhn
+ * @N Login via Config abschaltbar - siehe http://www.onlinebanking-forum.de/phpBB2/viewtopic.php?t=14386
+ *
  * Revision 1.2  2012/03/28 22:28:09  willuhn
  * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
  * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.

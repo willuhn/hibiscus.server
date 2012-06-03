@@ -1,3 +1,7 @@
+offen Version 2.4.0
+
+  * Passwort auf Webfrontend via Config-Datei abschaltbar
+
 2012-02-15 Version 2.2.0
 
   * Neues Release basierend auf Jameica 2.2.0 und Hibiscus 2.2.0

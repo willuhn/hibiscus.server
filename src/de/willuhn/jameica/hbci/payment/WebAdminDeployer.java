@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/WebAdminDeployer.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
+ * $Revision: 1.2 $
+ * $Date: 2012/06/03 13:47:45 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -49,6 +49,8 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
    */
   protected String[] getSecurityRoles()
   {
+    if (!Settings.isLoginEnabled())
+      return null;
     return new String[]{"admin"};
   }
 
@@ -57,6 +59,8 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
    */
   protected UserRealm getUserRealm()
   {
+    if (!Settings.isLoginEnabled())
+      return null;
     return new JameicaUserRealm();
   }
 
@@ -65,6 +69,9 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
 
 /*********************************************************************
  * $Log: WebAdminDeployer.java,v $
+ * Revision 1.2  2012/06/03 13:47:45  willuhn
+ * @N Login via Config abschaltbar - siehe http://www.onlinebanking-forum.de/phpBB2/viewtopic.php?t=14386
+ *
  * Revision 1.1  2011/11/12 15:09:59  willuhn
  * @N initial import
  *

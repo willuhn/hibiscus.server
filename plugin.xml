@@ -15,15 +15,15 @@
     <import plugin="hibiscus"         version="2.3.0+"/>
 
     <!-- Plattform-Erweiterungen -->
-    <import plugin="jameica.webadmin" version="1.2"/>
-    <import plugin="jameica.xmlrpc"   version="1.1"/>
-    <import plugin="jameica.soap"     version="1.0"/>
+    <import plugin="jameica.webadmin" version="2.3.0+"/>
+    <import plugin="jameica.xmlrpc"   version="2.3.0+"/>
+    <import plugin="jameica.soap"     version="1.0+"/>
 
-    <import plugin="jameica.sensors"  version="1.0" required="false" />
+    <import plugin="jameica.sensors"  version="1.0+" required="false" />
 
     <!-- Hibiscus-Connectoren -->
-    <import plugin="hibiscus.xmlrpc"  version="1.2"/>
-    <import plugin="hibiscus.soap"    version="1.0"/>
+    <import plugin="hibiscus.xmlrpc"  version="2.3.0+"/>
+    <import plugin="hibiscus.soap"    version="1.0+"/>
   </requires>
 
   <classfinder>
