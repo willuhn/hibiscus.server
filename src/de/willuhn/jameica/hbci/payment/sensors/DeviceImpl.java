@@ -36,6 +36,7 @@ import de.willuhn.util.I18N;
 public class DeviceImpl implements Device
 {
   private final static I18N i18n = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getI18N();
+  private final static de.willuhn.jameica.system.Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
   
   /**
    * @see de.willuhn.jameica.sensors.devices.Device#collect()
@@ -117,7 +118,7 @@ public class DeviceImpl implements Device
    */
   public boolean isEnabled()
   {
-    return true;
+    return settings.getBoolean("sensors.enabled",true);
   }
 
   /**
