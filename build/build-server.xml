@@ -27,7 +27,7 @@
     <loadproperties srcfile="build/build.properties"/>
     <xmlproperty file="plugin.xml" collapseattributes="true"/>
 
-    <!-- create cvs tag -->
+    <!-- create SCM tag -->
     <propertyfile file="build/TAG">
       <entry key="mytag" value="${plugin.version}" />
     </propertyfile>
@@ -39,7 +39,7 @@
 		<property name="release.filename"    value="${define.server.name}-${plugin.version}.zip" />
 
     <echo message="VERSION: ${plugin.version}" />
-    <echo message="CVS-Tag: ${tag}" />
+    <echo message="TAG    : ${tag}" />
     <echo message="JAVA   : ${java.version}" />
 	</target>
 
@@ -182,66 +182,6 @@
     </exec>
   </target>
 	
-	<target name="cvs_commit" description="cvs commit">
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../jameica/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../jameica.webadmin/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../jameica.xmlrpc/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../jameica.soap/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../jameica.sensors/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../hibiscus/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../hibiscus.xmlrpc/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../hibiscus.soap/build" />
-    </antcall>
-    <antcall target="sub_cvs_commit">
-      <param name="param.dir" value="../hibiscus.server/build" />
-    </antcall>
-	</target>
-  
-  <target name="cvs_tag" description="cvs tag">
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../jameica" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../jameica.webadmin" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../jameica.xmlrpc" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../jameica.soap" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../jameica.sensors" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../hibiscus" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../hibiscus.xmlrpc" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../hibiscus.soap" />
-    </antcall>
-    <antcall target="sub_cvs_tag">
-      <param name="param.dir" value="../hibiscus.server" />
-    </antcall>
-  </target>
-
 	<target name="clean" description="cleanup">
     <delete dir="../jameica/releases" />
     <delete dir="../jameica.webadmin/releases" />
@@ -254,19 +194,7 @@
     <delete dir="../hibiscus.server/releases/${define.server.name}" />
   </target>
 
-  <target depends="init,build,copy,pack,sign,cvs_commit,cvs_tag,clean" description="build an official release" name="all" />
-  <target depends="init,build,copy,pack,sign,cvs_commit,clean" description="build inofficial release" name="fast" />
-
-  <target name="sub_cvs_commit">
-    <exec executable="cvs" failonerror="true" dir="${param.dir}">
-      <arg line="commit -m 'Hibiscus Payment-Server ${plugin.version}' BUILD" />
-    </exec>
-  </target>
-
-  <target name="sub_cvs_tag">
-    <exec executable="cvs" failonerror="true" dir="${param.dir}">
-      <arg line="tag ${tag}" />
-    </exec>
-  </target>
+  <target depends="init,build,copy,pack,sign,clean" description="build an official release" name="all" />
+  <target depends="init,build,copy,pack,sign,clean" description="build inofficial release" name="fast" />
 
 </project>
