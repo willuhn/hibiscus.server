@@ -11,15 +11,17 @@
 
 package de.willuhn.jameica.hbci.payment.web.beans;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.payment.rmi.SchedulerService;
-import de.willuhn.jameica.hbci.rmi.SynchronizeJob;
-import de.willuhn.jameica.hbci.server.hbci.synchronize.SynchronizeEngine;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeBackend;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeEngine;
+import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.I18N;
@@ -56,14 +58,23 @@ public class Jobs
   
   /**
    * Liefert eine Liste der anstehenden Jobs.
-   * @return Liste der anstehenden Jobs oder NULL keine keine Jobs vorliegen.
+   * @return Liste der anstehenden Jobs oder NULL wenn keine keine Jobs vorliegen.
    */
   public List<SynchronizeJob> getJobs()
   {
     try
     {
-      List<SynchronizeJob> list = PseudoIterator.asList(SynchronizeEngine.getInstance().getSynchronizeJobs());
-      return list.size() > 0 ? list : null;
+      BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+      SynchronizeEngine engine = service.get(SynchronizeEngine.class);
+      List<SynchronizeJob> jobs = new ArrayList<SynchronizeJob>();
+      for (SynchronizeBackend backend:engine.getBackends())
+      {
+        List<SynchronizeJob> l = backend.getSynchronizeJobs(null);
+        if (l != null && l.size() > 0)
+          jobs.addAll(l);
+      }
+
+      return jobs.size() > 0 ? jobs : null;
     }
     catch (Exception e)
     {
@@ -72,21 +83,3 @@ public class Jobs
     }
   }
 }
-
-
-
-/**********************************************************************
- * $Log: Jobs.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.3  2010/03/24 12:09:47  willuhn
- * @N GUI-Polishing
- *
- * Revision 1.2  2010/02/26 17:00:04  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- **********************************************************************/

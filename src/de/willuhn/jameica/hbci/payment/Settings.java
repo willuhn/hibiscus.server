@@ -297,6 +297,24 @@ public class Settings
   }
   
   /**
+   * Legt fest, ob die Synchronisierung im Fehlerfall beendet werden soll.
+   * @return true, wenn die Synchronisierung im Fehlerfall beendet wird.
+   */
+  public static boolean getStopSyncOnError()
+  {
+    return settings.getBoolean("sync.stoponerror",true);
+  }
+  
+  /**
+   * Legt fest, ob die Synchronisierung im Fehlerfall beendet werden soll.
+   * @param stop true, wenn die Synchronisierung im Fehlerfall beendet wird.
+   */
+  public static void setStopSyncOnError(boolean stop)
+  {
+    settings.setAttribute("sync.stoponerror",stop);
+  }
+
+  /**
    * Liefert eine optionale Benachrichtigungs-URL, die aufgerufen wird, wenn
    * die Synchronisierung lief. Damit koennen Dritt-Systeme zeitnah reagieren,
    * wenn in Hibiscus neue Daten vorliegen.

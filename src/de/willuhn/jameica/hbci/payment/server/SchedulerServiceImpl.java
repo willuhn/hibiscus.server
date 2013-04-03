@@ -21,6 +21,7 @@ import java.util.Timer;
 import de.willuhn.jameica.hbci.payment.Settings;
 import de.willuhn.jameica.hbci.payment.messaging.SchedulerErrorMessageConsumer;
 import de.willuhn.jameica.hbci.payment.rmi.SchedulerService;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeBackend;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -80,7 +81,7 @@ public class SchedulerServiceImpl extends UnicastRemoteObject implements Schedul
     }
     
     this.mc = new SchedulerErrorMessageConsumer();
-    Application.getMessagingFactory().getMessagingQueue("hibiscus.server.error").registerMessageConsumer(this.mc);
+    Application.getMessagingFactory().getMessagingQueue(SynchronizeBackend.QUEUE_ERROR).registerMessageConsumer(this.mc);
     
     Logger.info("starting scheduler service");
     int interval = Settings.getSchedulerInterval();
@@ -113,7 +114,7 @@ public class SchedulerServiceImpl extends UnicastRemoteObject implements Schedul
     try
     {
       if (this.mc != null)
-        Application.getMessagingFactory().getMessagingQueue("hibiscus.server.error").unRegisterMessageConsumer(this.mc);
+        Application.getMessagingFactory().getMessagingQueue(SynchronizeBackend.QUEUE_ERROR).unRegisterMessageConsumer(this.mc);
 
       Logger.info("stopping scheduler service");
       this.task.cancel();
@@ -150,50 +151,3 @@ public class SchedulerServiceImpl extends UnicastRemoteObject implements Schedul
   }
 
 }
-
-
-/*********************************************************************
- * $Log: SchedulerServiceImpl.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.12  2011/10/25 13:57:16  willuhn
- * @R Saemtliche Lizenz-Checks entfernt - ist jetzt Opensource
- *
- * Revision 1.11  2010/02/24 17:39:29  willuhn
- * @N Synchronisierung kann nun auch manuell gestartet werden
- * @B kleinere Bugfixes
- *
- * Revision 1.10  2007/10/02 08:43:05  willuhn
- * #88
- *
- * Revision 1.9  2007/10/02 00:10:17  willuhn
- * @B Fehler in Ausschluss-Zeit
- *
- * Revision 1.8  2007/06/19 09:57:10  willuhn
- * @N Lizenz-Check
- *
- * Revision 1.7  2007/06/12 10:57:44  willuhn
- * #35
- * @N Konfigurierbarkeit eines Ausschluss-Zeitfensters
- *
- * Revision 1.6  2007/05/21 23:25:27  willuhn
- * *** empty log message ***
- *
- * Revision 1.5  2007/05/21 00:19:06  willuhn
- * @N key upload
- *
- * Revision 1.4  2007/05/16 16:49:42  willuhn
- * @N display ongoing hbci jobs
- *
- * Revision 1.3  2007/05/16 16:26:04  willuhn
- * @N Webfrontend
- *
- * Revision 1.2  2007/05/16 14:16:43  willuhn
- * @N nextExecutionTime
- * @N Scheduler cleanup
- *
- * Revision 1.1  2007/05/15 17:21:08  willuhn
- * @N Added Scheduler
- *
- **********************************************************************/

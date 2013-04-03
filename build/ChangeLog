@@ -1,3 +1,7 @@
+2013-04-03 Version 2.5.1 (beta)
+
+  * NEW: BUGZILLA 1346 Umbau des HBCI-Backends auf ein generisches Synchronize-Backend
+
 2012-12-02 Version 2.4.0
 
   * Neues Release basierend auf Jameica 2.4.0 und Hibiscus 2.4.0

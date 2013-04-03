@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.payment.rmi.ExecuteService;
 import de.willuhn.jameica.hbci.payment.rmi.SchedulerService;
-import de.willuhn.jameica.hbci.server.hbci.HBCIFactory;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeBackend;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeEngine;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.annotation.Response;
 
@@ -67,41 +69,13 @@ public class Welcome
    */
   public boolean isRunning()
   {
-    return HBCIFactory.getInstance().inProgress();
+    BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+    SynchronizeEngine engine = service.get(SynchronizeEngine.class);
+    for (SynchronizeBackend backend:engine.getBackends())
+    {
+      if (backend.getCurrentSession() != null)
+        return true;
+    }
+    return false;
   }
-
 }
-
-
-
-/**********************************************************************
- * $Log: Welcome.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.8  2011/10/25 13:57:16  willuhn
- * @R Saemtliche Lizenz-Checks entfernt - ist jetzt Opensource
- *
- * Revision 1.7  2011/04/11 08:55:46  willuhn
- * @N TICKET #128
- *
- * Revision 1.6  2010/11/04 18:17:53  willuhn
- * @B Lizenz-Upload wurde auch dann noch angezeigt, wenn sie schon hochgeladen wurde, aber die Zustimmung der Lizenzbedingungen noch fehlte
- *
- * Revision 1.5  2010/11/04 17:25:28  willuhn
- * @N Upload des Lizenzschluessels uebers Webfrontend
- *
- * Revision 1.4  2010/11/04 13:28:26  willuhn
- * @N Lizenzbedingungen muessen nun explizit im Browser akzeptiert werden
- *
- * Revision 1.3  2010/03/24 12:09:47  willuhn
- * @N GUI-Polishing
- *
- * Revision 1.2  2010/02/26 17:00:04  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2010/02/24 17:39:29  willuhn
- * @N Synchronisierung kann nun auch manuell gestartet werden
- * @B kleinere Bugfixes
- *
- **********************************************************************/

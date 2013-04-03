@@ -16,6 +16,7 @@ import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.payment.Settings;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
+import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 
@@ -37,7 +38,7 @@ public class SchedulerErrorMessageConsumer implements MessageConsumer
    */
   public Class[] getExpectedMessageTypes()
   {
-    return new Class[]{Message.class};
+    return new Class[]{QueryMessage.class};
   }
 
   /**
@@ -50,6 +51,7 @@ public class SchedulerErrorMessageConsumer implements MessageConsumer
     
     try
     {
+      Logger.info("scheduler configured to stop on synchronization errors, stopping scheduler");
       Service s = Application.getServiceFactory().lookup(Plugin.class,"scheduler");
       s.stop(true);
     }
@@ -60,16 +62,3 @@ public class SchedulerErrorMessageConsumer implements MessageConsumer
   }
 
 }
-
-
-
-/**********************************************************************
- * $Log: SchedulerErrorMessageConsumer.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.1  2010/02/24 17:39:29  willuhn
- * @N Synchronisierung kann nun auch manuell gestartet werden
- * @B kleinere Bugfixes
- *
- **********************************************************************/

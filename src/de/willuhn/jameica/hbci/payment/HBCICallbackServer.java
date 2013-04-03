@@ -27,9 +27,12 @@ import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
 import de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan;
+import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Nachricht;
-import de.willuhn.jameica.hbci.server.hbci.HBCIFactory;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
+import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.messaging.QueryMessage;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 
@@ -134,7 +137,12 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
       case NEED_PT_TAN:
         Logger.info("sending TAN message");
-        TANMessage tm = new TANMessage(msg, passport, HBCIFactory.getInstance().getCurrentKonto());
+        
+        BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+        SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
+        Konto konto = session != null ? session.getKonto() : null;
+        
+        TANMessage tm = new TANMessage(msg, passport, konto);
         Application.getMessagingFactory().sendSyncMessage(tm);
         String tan = tm.getTAN();
         if (tan == null || tan.length() == 0)
@@ -158,7 +166,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
       case NEED_PT_PIN:
         String pw = Settings.getHBCIPassword(passport,reason);
         if (pw == null || pw.length() == 0)
-          throw new RuntimeException("no password/pin definded for passport " + passport.getClass().getName());
+          throw new RuntimeException("no password/pin found for passport " + passport.getClass().getName());
 
         // Wir haben ein gespeichertes Passwort. Das nehmen wir.
         retData.replace(0,retData.length(),pw);
@@ -339,77 +347,3 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
     
   }
 }
-
-
-/*********************************************************************
- * $Log: HBCICallbackServer.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.22  2010/11/08 12:06:47  willuhn
- * *** empty log message ***
- *
- * Revision 1.21  2010/11/08 11:38:48  willuhn
- * @B Beim Ermitteln der TAN-Verfahren kann initial eine Rekursion auftreten
- *
- * Revision 1.20  2010/09/22 15:05:25  willuhn
- * *** empty log message ***
- *
- * Revision 1.19  2010/09/10 15:52:29  willuhn
- * @N Umstellung auf Multi-DDV-Support - Migration der Passport-Dateien
- *
- * Revision 1.18  2010/03/04 16:51:13  willuhn
- * *** empty log message ***
- *
- * Revision 1.17  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- * Revision 1.16  2008/11/18 13:46:27  willuhn
- * @N Infopoint-Response
- *
- * Revision 1.15  2008/11/18 13:42:18  willuhn
- * @N Infopoint-Response
- *
- * Revision 1.14  2008/09/02 08:24:05  willuhn
- * @B NPE
- *
- * Revision 1.13  2008/05/30 12:31:12  willuhn
- * @N Aufruf der Update-Cache-Funktion
- *
- * Revision 1.12  2008/05/30 12:01:35  willuhn
- * @N Gemeinsame Basisimplementierung des HBCICallback in Hibiscus und Payment-Server
- *
- * Revision 1.11  2007/09/05 16:14:23  willuhn
- * @N TAN-Support via XML-RPC Callback Handler
- *
- * Revision 1.10  2007/09/01 21:47:25  willuhn
- * @N PIN/TAN Sicherheitsverfahren
- *
- * Revision 1.9  2007/08/31 00:09:14  willuhn
- * @N PIN/TAN-Support
- *
- * Revision 1.8  2007/08/30 21:47:33  willuhn
- * @N Callback-Abfragen fuer PIN/TAN
- *
- * Revision 1.7  2007/08/30 17:56:38  willuhn
- * *** empty log message ***
- *
- * Revision 1.6  2007/08/30 17:44:06  willuhn
- * @N PIN/TAN-Support
- *
- * Revision 1.5  2007/07/20 15:03:48  willuhn
- * @N Instituts-Meldungen direkt speichern. Consolen-Eingaben vermeiden
- *
- * Revision 1.4  2007/05/29 16:58:04  willuhn
- * @N Support fuer Chipkarte
- *
- * Revision 1.3  2007/05/21 00:19:06  willuhn
- * @N key upload
- *
- * Revision 1.2  2007/05/15 17:21:08  willuhn
- * @N Added Scheduler
- *
- * Revision 1.1  2007/05/15 16:40:04  willuhn
- * @N Initial checkin for "Hibiscus Payment-Server"
- *
- **********************************************************************/

@@ -11,6 +11,8 @@
 
 package de.willuhn.jameica.hbci.payment.util;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,7 +21,7 @@ import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.GenericObject;
 
 /**
- * 
+ * JSON Utils.
  */
 public class JsonUtil
 {
@@ -32,26 +34,48 @@ public class JsonUtil
   public static JSONArray toJson(GenericIterator list) throws Exception
   {
     JSONArray result = new JSONArray();
-    while (list.hasNext())
+    if (list != null)
     {
-      result.put(toJson(list.next()));
+      while (list.hasNext())
+      {
+        result.put(toJson(list.next()));
+      }
     }
     return result;
   }
 
   /**
-   * Wandelt ein Fachobjekt in JSON um.
-   * @param object das Fachobjekt.
+   * Wandelt eine Liste von Beans in JSON um.
+   * @param list Liste der Beans.
+   * @return JSON-Liste.
+   * @throws Exception
+   */
+  public static JSONArray toJson(List list) throws Exception
+  {
+    JSONArray result = new JSONArray();
+    if (list != null)
+    {
+      for (Object o:list)
+      {
+        result.put(toJson(o));
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Wandelt eine Bean in JSON um.
+   * @param object die Bean.
    * @return JSON-Objekt.
    * @throws Exception
    */
-  public static JSONObject toJson(GenericObject object) throws Exception
+  public static JSONObject toJson(Object object) throws Exception
   {
     JSONObject o = new JSONObject();
-    String[] names = object.getAttributeNames();
+    List<String> names = BeanUtil.getProperties(object);
     for (String name:names)
     {
-      Object value = object.getAttribute(name);
+      Object value = BeanUtil.get(object,name);
       String s = null;
       if (value != null && (value instanceof GenericObject))
         s = ((GenericObject)value).getID();
@@ -59,7 +83,9 @@ public class JsonUtil
         s = BeanUtil.toString(value);
       o.put(name,s);
     }
-    o.put("id",object.getID());
+    
+    if (object instanceof GenericObject)
+      o.put("id",((GenericObject)object).getID());
     return o;
   }
 

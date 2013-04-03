@@ -11,26 +11,26 @@
 
 package de.willuhn.jameica.hbci.payment.server;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Iterator;
+import java.util.List;
 
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-
-import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.payment.rmi.ExecuteService;
-import de.willuhn.jameica.hbci.rmi.Konto;
-import de.willuhn.jameica.hbci.rmi.SynchronizeJob;
-import de.willuhn.jameica.hbci.server.hbci.AbstractHBCIJob;
-import de.willuhn.jameica.hbci.server.hbci.HBCIFactory;
-import de.willuhn.jameica.hbci.server.hbci.synchronize.SynchronizeEngine;
+import de.willuhn.jameica.hbci.payment.web.beans.Welcome;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeBackend;
+import de.willuhn.jameica.hbci.synchronize.SynchronizeEngine;
+import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
+import de.willuhn.jameica.messaging.Message;
+import de.willuhn.jameica.messaging.MessageConsumer;
+import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.messaging.StatusBarMessage;
-import de.willuhn.jameica.messaging.TextMessage;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 import de.willuhn.util.ProgressMonitor;
 
@@ -41,10 +41,9 @@ public class ExecuteServiceImpl extends UnicastRemoteObject implements ExecuteSe
 {
   private final static I18N i18n   = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getI18N();
 
-  private boolean started          = false;
-  
-  private GenericIterator accounts = null;
-  private boolean success          = false;
+  private boolean started                   = false;
+  private MessageConsumer mc                = new MyMessageConsumer();
+  private Iterator<SynchronizeBackend> list = null;
 
   
   /**
@@ -61,127 +60,128 @@ public class ExecuteServiceImpl extends UnicastRemoteObject implements ExecuteSe
    */
   public void run() throws RemoteException
   {
-    try
+    if (list != null || new Welcome().isRunning())
     {
-      if (HBCIFactory.getInstance().inProgress())
-      {
-        Logger.warn("another hbci job is allready running, cancel current run");
-        Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Es läuft bereits eine HBCI-Synchronisierung"),StatusBarMessage.TYPE_ERROR));
-        return;
-      }
-      this.accounts = SynchronizeEngine.getInstance().getSynchronizeKonten();
-      Logger.info("accounts to synchronize: " + this.accounts.size());
-      success = true;
-      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("HBCI-Synchronisierung gestartet"),StatusBarMessage.TYPE_SUCCESS));
-      sync(ProgressMonitor.STATUS_NONE);
-    }
-    catch (RemoteException re)
-    {
-      error(re);
-    }
-  }
-
-  /**
-   * Fehlerbehandlung.
-   * @param e optionaler Fehler.
-   */
-  private synchronized void error(Exception e)
-  {
-    Logger.error("error while synchronizing",e);
-
-    try
-    {
-      StringBuffer text = new StringBuffer();
-      if (e != null)
-      {
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        writer.flush();
-        text.append(writer.toString());
-      }
-
-      TextMessage t = new TextMessage(i18n.tr("HBCI-Synchronisierung mit Fehler beendet. Bitte Logs prüfen"),text.toString());
-      Application.getMessagingFactory().getMessagingQueue("hibiscus.server.error").sendMessage(t);
-    }
-    finally
-    {
-      this.accounts = null;
-    }
-  }
-
-  /**
-   * Sendet die HBCI-Jobs.
-   * @param lastStatus der Statuscode des vorherigen Durchlaufs.
-   */
-  private void sync(int lastStatus)
-  {
-    // Globalen Status merken
-    success &= (lastStatus == ProgressMonitor.STATUS_DONE || lastStatus == ProgressMonitor.STATUS_NONE);
-
-    // Bei Abbruch brechen wir immer ab ;)
-    if (lastStatus == ProgressMonitor.STATUS_CANCEL)
-    {
-      Logger.info("synchronize cancelled");
+      Logger.warn("synchronization already running, cancel current run");
+      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Synchronisierung läuft bereits"),StatusBarMessage.TYPE_ERROR));
       return;
     }
     
-    if (!success)
-    {
-      error(null);
-      return;
-    }
-
     try
     {
-      if (this.accounts == null || !this.accounts.hasNext())
-      {
-        Logger.info("synchronize run finished");
-        return;
-      }
+      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Synchronisierung läuft"),StatusBarMessage.TYPE_SUCCESS));
       
-      Logger.info("creating hbci factory");
-      HBCIFactory factory = HBCIFactory.getInstance();
+      BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+      SynchronizeEngine engine = service.get(SynchronizeEngine.class);
+      List<SynchronizeBackend> backends = engine.getBackends();
+      this.list = backends.iterator();
 
-      final Konto konto = (Konto) this.accounts.next();
-      GenericIterator list = SynchronizeEngine.getInstance().getSynchronizeJobs(konto);
-      int count = 0;
-      while (list.hasNext())
-      {
-        SynchronizeJob sj = (SynchronizeJob) list.next();
-        
-        AbstractHBCIJob[] currentJobs = sj.createHBCIJobs();
-        if (currentJobs != null)
-        {
-          for (int i=0;i<currentJobs.length;++i)
-          {
-            factory.addJob(currentJobs[i]);
-          }
-        }
-        count++;
-      }
+      Logger.info("synchronizing " + backends.size() + " backends");
+      
+      // Auf die Events registrieren, um die Folge-Backends zu starten
+      Application.getMessagingFactory().getMessagingQueue(SynchronizeBackend.QUEUE_STATUS).registerMessageConsumer(this.mc);
 
-      if (count == 0)
-      {
-        Logger.info("nothing to do for account " + konto.getLongName() + " - skipping");
-        sync(ProgressMonitor.STATUS_NONE);
-      }
-      else
-      {
-        factory.executeJobs(konto,new Listener() {
-          public void handleEvent(Event event)
-          {
-            sync(event.type);
-          }
-        });
-      }
+      this.sync();
     }
-    catch (Exception e)
+    catch (RuntimeException re)
     {
-      error(e);
+      done();
+      throw re;
+    }
+  }
+
+  /**
+   * Startet den naechsten Durchlauf.
+   * @throws ApplicationException
+   */
+  private void sync()
+  {
+    if (!this.list.hasNext())
+    {
+      done();
+      Logger.info("no more backends. synchronization done");
+      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Synchronisierung beendet"),StatusBarMessage.TYPE_SUCCESS));
+      return;
+    }
+    
+    try
+    {
+      // Sonst naechste Iteration starten
+      SynchronizeBackend backend = this.list.next();
+      List<SynchronizeJob> jobs = backend.getSynchronizeJobs(null);
+      Logger.info("synchronizing backend " + backend.getName() + " with " + jobs.size() + " jobs");
+      backend.execute(jobs);
+    }
+    catch (ApplicationException ae)
+    {
+      done();
+      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(ae.getMessage(),StatusBarMessage.TYPE_ERROR));
+    }
+    catch (OperationCanceledException oce)
+    {
+      done();
+      Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Synchronisierung abgebrochen"),StatusBarMessage.TYPE_ERROR));
     }
   }
   
+  /**
+   * Uebernimmt Aufraeumarbeiten nach Beendigung der Synchronisierung.
+   */
+  private void done()
+  {
+    this.list = null;
+    Application.getMessagingFactory().getMessagingQueue(SynchronizeBackend.QUEUE_STATUS).unRegisterMessageConsumer(this.mc);
+  }
   
+  /**
+   * Wird ueber die Status-Events der Backends benachrichtigt und startet dann das naechste
+   */
+  private class MyMessageConsumer implements MessageConsumer
+  {
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#getExpectedMessageTypes()
+     */
+    public Class[] getExpectedMessageTypes()
+    {
+      return new Class[]{QueryMessage.class};
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#handleMessage(de.willuhn.jameica.messaging.Message)
+     */
+    public void handleMessage(Message message) throws Exception
+    {
+      QueryMessage msg = (QueryMessage) message;
+      Object data = msg.getData();
+      if (!(data instanceof Integer))
+      {
+        Logger.warn("got unknown data: " + data);
+        return;
+      }
+      
+      int status = ((Integer) data).intValue();
+      switch (status)
+      {
+        case ProgressMonitor.STATUS_DONE:
+          sync(); // Erfolgreich. Weiter zum naechsten Backend
+          break;
+          
+        case ProgressMonitor.STATUS_CANCEL:
+        case ProgressMonitor.STATUS_ERROR:
+          done(); // Fehler. Aufhoeren
+          break;
+      }
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
+     */
+    public boolean autoRegister()
+    {
+      return false;
+    }
+  }
+
   /**
    * @see de.willuhn.datasource.Service#getName()
    */
@@ -230,25 +230,7 @@ public class ExecuteServiceImpl extends UnicastRemoteObject implements ExecuteSe
       return;
     }
     this.started = false;
+    this.list = null;
   }
 
 }
-
-
-
-/**********************************************************************
- * $Log: ExecuteServiceImpl.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.3  2011/10/25 13:57:16  willuhn
- * @R Saemtliche Lizenz-Checks entfernt - ist jetzt Opensource
- *
- * Revision 1.2  2010/02/24 17:54:26  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2010/02/24 17:39:29  willuhn
- * @N Synchronisierung kann nun auch manuell gestartet werden
- * @B kleinere Bugfixes
- *
- **********************************************************************/

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<plugin name="hibiscus.server" version="2.5.0-beta" class="de.willuhn.jameica.hbci.payment.Plugin"
+<plugin name="hibiscus.server" version="2.5.1-beta" class="de.willuhn.jameica.hbci.payment.Plugin"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
 
@@ -12,7 +12,7 @@
   <requires jameica="2.5.0+">
 
     <!-- Hibiscus selbst -->
-    <import plugin="hibiscus"         version="2.5.0+"/>
+    <import plugin="hibiscus"         version="2.5.1+"/>
 
     <!-- Plattform-Erweiterungen -->
     <import plugin="jameica.webadmin" version="2.3.0+"/>
@@ -39,6 +39,7 @@
 
   <messaging>
     <consumer queue="hibiscus.passport.rdh.hbciversion" class="de.willuhn.jameica.hbci.payment.messaging.QueryHBCIVersionMessageConsumer" />
+    <consumer queue="hibiscus.sync.error"               class="de.willuhn.jameica.hbci.payment.messaging.SynchronizeErrorMessageConsumer" />
   </messaging>
   
 </plugin>
