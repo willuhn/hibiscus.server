@@ -56,7 +56,20 @@
     <ant antfile="../hibiscus.server/build/build.xml"  target="signzip" inheritall="false" />
 	</target>
 
-  <target name="copy" depends="build" description="copy the modules">
+  <target name="build-nightly" depends="init" description="build the modules">
+    <ant antfile="../jameica/build/build.xml"          target="zip" inheritall="false" />
+    <ant antfile="../jameica.webadmin/build/build.xml" target="zip" inheritall="false" />
+    <ant antfile="../jameica.xmlrpc/build/build.xml"   target="zip" inheritall="false" />
+    <ant antfile="../jameica.soap/build/build.xml"     target="zip" inheritall="false" />
+    <ant antfile="../jameica.sensors/build/build.xml"  target="zip" inheritall="false" />
+
+    <ant antfile="../hibiscus/build/build.xml"         target="zip" inheritall="false" />
+    <ant antfile="../hibiscus.xmlrpc/build/build.xml"  target="zip" inheritall="false" />
+    <ant antfile="../hibiscus.soap/build/build.xml"    target="zip" inheritall="false" />
+    <ant antfile="../hibiscus.server/build/build.xml"  target="zip" inheritall="false" />
+  </target>
+
+  <target name="copy" description="copy the modules">
     <mkdir dir="releases/${define.server.name}"/>
   	
   	<!-- Jameica -->
@@ -195,6 +208,17 @@
   </target>
 
   <target depends="init,build,copy,pack,sign,clean" description="build an official release" name="all" />
-  <target depends="init,build,copy,pack,sign,clean" description="build inofficial release" name="fast" />
 
+  <target depends="init,build-nightly,copy,pack" description="build nightly build" name="nightly">
+    <mkdir dir="../hibiscus.server/releases/nightly" />
+
+    <copy file="releases/${release.filename}" tofile="releases/nightly/${define.server.name}-${plugin.version}-nightly.zip" />
+
+    <antcall target="clean" />
+    <delete includeemptydirs="true"> <!-- geht leider nur so, weil ein einfaches delete dir keine Wildcards unterstuetzt -->
+      <fileset dir="../hibiscus.server/releases" includes="${plugin.version}-*/**" defaultexcludes="false"/>
+    </delete>
+    <delete file="../hibiscus.server/releases/${release.filename}" />
+  </target>
+  
 </project>
