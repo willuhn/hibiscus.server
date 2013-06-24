@@ -212,7 +212,7 @@
   <target depends="init,build-nightly,copy,pack" description="build nightly build" name="nightly">
     <mkdir dir="../hibiscus.server/releases/nightly" />
 
-    <copy file="releases/${release.filename}" tofile="releases/nightly/${define.server.name}-${plugin.version}-nightly.zip" />
+    <copy file="releases/${release.filename}" tofile="releases/nightly/${define.server.name}-${plugin.version}.zip" />
 
     <antcall target="clean" />
     <delete includeemptydirs="true"> <!-- geht leider nur so, weil ein einfaches delete dir keine Wildcards unterstuetzt -->
