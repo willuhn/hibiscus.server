@@ -57,16 +57,8 @@
 	</target>
 
   <target name="build-nightly" depends="init" description="build the modules">
-    <ant antfile="../jameica/build/build.xml"          target="zip" inheritall="false" />
-    <ant antfile="../jameica.webadmin/build/build.xml" target="zip" inheritall="false" />
-    <ant antfile="../jameica.xmlrpc/build/build.xml"   target="zip" inheritall="false" />
-    <ant antfile="../jameica.soap/build/build.xml"     target="zip" inheritall="false" />
-    <ant antfile="../jameica.sensors/build/build.xml"  target="zip" inheritall="false" />
-
-    <ant antfile="../hibiscus/build/build.xml"         target="zip" inheritall="false" />
-    <ant antfile="../hibiscus.xmlrpc/build/build.xml"  target="zip" inheritall="false" />
-    <ant antfile="../hibiscus.soap/build/build.xml"    target="zip" inheritall="false" />
-    <ant antfile="../hibiscus.server/build/build.xml"  target="zip" inheritall="false" />
+    <!-- Der Rest muss nicht gebaut werden, der ist schon als Nightly vorhanden -->
+    <ant antfile="../hibiscus.server/build/build.xml"  target="zip"     inheritall="false" />
   </target>
 
   <target name="copy" description="copy the modules">
@@ -76,6 +68,7 @@
   	<unzip dest="releases/${define.server.name}">
   		<fileset dir="../jameica/releases">
   			<include name="**/jameica.zip"/>
+        <include name="**/jameica-*-nightly.zip"/>
   	  </fileset>
   	</unzip>
   	<move todir="releases/${define.server.name}">
@@ -110,42 +103,49 @@
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../jameica.webadmin/releases">
         <include name="**/jameica.webadmin.zip"/>
+        <include name="**/jameica.webadmin-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- jameica.xmlrpc -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../jameica.xmlrpc/releases">
         <include name="**/jameica.xmlrpc.zip"/>
+        <include name="**/jameica.xmlrpc-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- jameica.soap -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../jameica.soap/releases">
         <include name="**/jameica.soap.zip"/>
+        <include name="**/jameica.soap-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- jameica.sensors -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../jameica.sensors/releases">
         <include name="**/jameica.sensors.zip"/>
+        <include name="**/jameica.sensors-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- hibiscus -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../hibiscus/releases">
         <include name="**/hibiscus.zip"/>
+        <include name="**/hibiscus-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- hibiscus.xmlrpc -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../hibiscus.xmlrpc/releases">
         <include name="**/hibiscus.xmlrpc.zip"/>
+        <include name="**/hibiscus.xmlrpc-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- hibiscus.soap -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../hibiscus.soap/releases">
         <include name="**/hibiscus.soap.zip"/>
+        <include name="**/hibiscus.soap-*-nightly.zip"/>
       </fileset>
     </unzip>
     <!-- hibiscus.server -->
@@ -210,15 +210,14 @@
   <target depends="init,build,copy,pack,sign,clean" description="build an official release" name="all" />
 
   <target depends="init,build-nightly,copy,pack" description="build nightly build" name="nightly">
-    <mkdir dir="../hibiscus.server/releases/nightly" />
 
-    <copy file="releases/${release.filename}" tofile="releases/nightly/${define.server.name}-${plugin.version}.zip" />
+    <mkdir dir="releases/nightly" />
+    <move file="releases/${release.filename}" tofile="releases/nightly/${define.server.name}-${plugin.version}.zip" />
 
-    <antcall target="clean" />
     <delete includeemptydirs="true"> <!-- geht leider nur so, weil ein einfaches delete dir keine Wildcards unterstuetzt -->
-      <fileset dir="../hibiscus.server/releases" includes="${plugin.version}-*/**" defaultexcludes="false"/>
+      <fileset dir="releases" includes="${plugin.version}-*/**" defaultexcludes="false"/>
     </delete>
-    <delete file="../hibiscus.server/releases/${release.filename}" />
+    <delete dir="releases/${define.server.name}" />
   </target>
   
 </project>
