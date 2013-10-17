@@ -199,13 +199,17 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         Logger.error("IBAN/CRC error: " + msg+ " ["+retData.toString()+"]: "); // Muesste ich mal noch behandeln
         return;
 
+      case WRONG_PIN:
+        Logger.error("detected wrong PIN: " + msg+ " ["+retData.toString()+"]: ");
+        return;
+
       case HBCICallback.NEED_CHIPCARD:
         Logger.debug("callback: need chipcard");
         return;
       case HBCICallback.HAVE_CHIPCARD:
         Logger.debug("callback: have chipcard");
         return;
-
+        
       case HBCICallback.NEED_HARDPIN:
       case HBCICallback.HAVE_HARDPIN:
         throw new HBCI_Exception("hard pin not allowed in payment server");
