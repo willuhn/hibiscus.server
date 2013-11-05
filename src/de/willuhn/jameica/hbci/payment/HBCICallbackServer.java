@@ -21,10 +21,12 @@ import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.HBCIUtilsInternal;
+import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 
 import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
+import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
 import de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -203,6 +205,11 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         Logger.error("detected wrong PIN: " + msg+ " ["+retData.toString()+"]: ");
         return;
 
+      case USERID_CHANGED:
+        Logger.info("got changed user/account data (code 3072) - saving in persistent data for later handling");
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_CONFIG,retData.toString());
+        return;
+        
       case HBCICallback.NEED_CHIPCARD:
         Logger.debug("callback: need chipcard");
         return;
