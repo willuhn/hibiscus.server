@@ -109,6 +109,13 @@ public class ExecuteServiceImpl extends UnicastRemoteObject implements ExecuteSe
       // Sonst naechste Iteration starten
       SynchronizeBackend backend = this.list.next();
       List<SynchronizeJob> jobs = backend.getSynchronizeJobs(null);
+      if (jobs == null || jobs.size() == 0)
+      {
+        // Bescheid geben, dass das naechste Backend darf
+        Application.getMessagingFactory().getMessagingQueue(SynchronizeBackend.QUEUE_STATUS).sendMessage(new QueryMessage(ProgressMonitor.STATUS_DONE));
+        Logger.info("backend " + backend.getName() + " contains no jobs, skipping");
+        return;
+      }
       Logger.info("synchronizing backend " + backend.getName() + " with " + jobs.size() + " jobs");
       backend.execute(jobs);
     }

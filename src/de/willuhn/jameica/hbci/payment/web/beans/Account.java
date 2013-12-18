@@ -124,6 +124,7 @@ public class Account
     options.setSyncLastschriften(request.getParameter("last") != null);
     options.setSyncDauerauftraege(request.getParameter("dauer") != null);
     options.setSyncAuslandsUeberweisungen(request.getParameter("foreign") != null);
+    options.setSyncSepaLastschriften(request.getParameter("sepalast") != null);
     Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Synchronisierungsoptionen gespeichert"),StatusBarMessage.TYPE_SUCCESS));
   }
   
