@@ -8,5 +8,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica.sensors"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus.xmlrpc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica.xmlrpc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus.soap"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jameica.soap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
