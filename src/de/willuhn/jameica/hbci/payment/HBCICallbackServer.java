@@ -15,12 +15,10 @@ package de.willuhn.jameica.hbci.payment;
 
 import java.util.Date;
 
-import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.manager.HBCIUtilsInternal;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 
@@ -230,131 +228,12 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
     }
     parent.callback(passport, reason, msg, datatype, retData);
   }
-
+  
   /**
-   * @see org.kapott.hbci.callback.HBCICallback#status(org.kapott.hbci.passport.HBCIPassport, int, java.lang.Object[])
+   * @see de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback#status(java.lang.String)
    */
-  public void status(HBCIPassport passport, int statusTag, Object[] o) {
-    switch (statusTag) {
-
-      case STATUS_INST_BPD_INIT:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_INST_DATA"));
-        break;
-
-      case STATUS_INST_BPD_INIT_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_INST_DATA_DONE",passport.getBPDVersion()));
-        break;
-
-      case STATUS_INST_GET_KEYS:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_INST_KEYS"));
-        break;
-
-      case STATUS_INST_GET_KEYS_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_INST_KEYS_DONE"));
-        break;
-
-      case STATUS_SEND_KEYS:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_SEND_MY_KEYS"));
-        break;
-
-      case STATUS_SEND_KEYS_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_SEND_MY_KEYS_DONE"));
-        break;
-
-      case STATUS_INIT_SYSID:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_SYSID"));
-        break;
-
-      case STATUS_INIT_SYSID_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_SYSID_DONE",o[1].toString()));
-        break;
-
-      case STATUS_INIT_SIGID:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_SIGID"));
-        break;
-
-      case STATUS_INIT_SIGID_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_SIGID_DONE",o[1].toString()));
-        break;
-
-      case STATUS_INIT_UPD:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_USER_DATA"));
-        break;
-
-      case STATUS_INIT_UPD_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_REC_USER_DATA_DONE",passport.getUPDVersion()));
-        break;
-
-      case STATUS_LOCK_KEYS:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_USR_LOCK"));
-        break;
-
-      case STATUS_LOCK_KEYS_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_USR_LOCK_DONE"));
-        break;
-
-      case STATUS_DIALOG_INIT:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_INIT"));
-        break;
-
-      case STATUS_DIALOG_INIT_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_INIT_DONE",o[1]));
-        break;
-
-      case STATUS_SEND_TASK:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_NEW_JOB",((HBCIJob)o[0]).getName()));
-        break;
-
-      case STATUS_SEND_TASK_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_JOB_DONE",((HBCIJob)o[0]).getName()));
-        break;
-
-      case STATUS_DIALOG_END:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_END"));
-        break;
-
-      case STATUS_DIALOG_END_DONE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_DIALOG_END_DONE"));
-        break;
-
-      case STATUS_MSG_CREATE:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_CREATE",o[0].toString()));
-        break;
-
-      case STATUS_MSG_SIGN:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_SIGN"));
-        break;
-
-      case STATUS_MSG_CRYPT:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_CRYPT"));
-        break;
-
-      case STATUS_MSG_SEND:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_SEND"));
-        break;
-
-      case STATUS_MSG_RECV:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_RECV"));
-        break;
-
-      case STATUS_MSG_PARSE:
-        Logger.debug(HBCIUtilsInternal.getLocMsg("STATUS_MSG_PARSE",o[0].toString()+")"));
-        break;
-
-      case STATUS_MSG_DECRYPT:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_DECRYPT"));
-        break;
-
-      case STATUS_MSG_VERIFY:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_MSG_VERIFY"));
-        break;
-      case STATUS_SEND_INFOPOINT_DATA:
-        Logger.info(HBCIUtilsInternal.getLocMsg("STATUS_SEND_INFOPOINT_DATA"));
-        break;
-
-      default:
-        this.parent.status(passport,statusTag,o);
-    }
-    
+  protected void status(String text)
+  {
+    Logger.info(text);
   }
 }
