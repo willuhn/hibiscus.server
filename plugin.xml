@@ -19,7 +19,7 @@
     <import plugin="jameica.xmlrpc"   version="2.6.0+"/>
     <import plugin="jameica.soap"     version="2.6.0+"/>
 
-    <import plugin="jameica.sensors"  version="2.6.0+" required="false" />
+    <import plugin="jameica.sensors"  version="2.6.0+"/>
 
     <!-- Hibiscus-Connectoren -->
     <import plugin="hibiscus.xmlrpc"  version="2.6.0+"/>
