@@ -54,7 +54,7 @@ public class UeberweisungBean implements AutoRestBean
   @Path("/hibiscus/ueberweisung/list/open$")
   public Object open() throws Exception
   {
-    HBCIDBService service = (HBCIDBService) Settings.getDBService();
+    HBCIDBService service = Settings.getDBService();
     DBIterator i = service.createList(Ueberweisung.class);
     i.addFilter("(ausgefuehrt is null or ausgefuehrt = 0)");
     i.setOrder("ORDER BY " + service.getSQLTimestamp("termin") + " DESC, id DESC");

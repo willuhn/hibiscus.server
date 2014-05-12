@@ -44,7 +44,7 @@ public abstract class AbstractPassports
    */
   public String getName() throws Exception
   {
-    return ((Passport) PassportRegistry.findByClass(getImplementationClass().getName())).getName();
+    return PassportRegistry.findByClass(getImplementationClass().getName()).getName();
   }
 
   /**

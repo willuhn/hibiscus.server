@@ -73,7 +73,7 @@ public class Settings
     {
       Class<Engine> ec = Application.getPluginLoader().getManifest(Plugin.class).getClassLoader().load(engineClass);
       BeanService service = Application.getBootLoader().getBootable(BeanService.class);
-      engine = (Engine) service.get(ec);
+      engine = service.get(ec);
     }
     catch (Exception e)
     {
