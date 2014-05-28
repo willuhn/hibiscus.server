@@ -1,10 +1,6 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/web/beans/Account.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
  *
- * Copyright (c) by willuhn - software & services
+ * Copyright (c) by Olaf Willuhn
  * All rights reserved
  *
  **********************************************************************/
@@ -123,6 +119,7 @@ public class Account
     options.setSyncUeberweisungen(request.getParameter("ueb") != null);
     options.setSyncLastschriften(request.getParameter("last") != null);
     options.setSyncDauerauftraege(request.getParameter("dauer") != null);
+    options.setSyncSepaDauerauftraege(request.getParameter("sepadauer") != null);
     options.setSyncAuslandsUeberweisungen(request.getParameter("foreign") != null);
     options.setSyncSepaLastschriften(request.getParameter("sepalast") != null);
     Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Synchronisierungsoptionen gespeichert"),StatusBarMessage.TYPE_SUCCESS));
@@ -139,21 +136,3 @@ public class Account
   }
 
 }
-
-
-
-/**********************************************************************
- * $Log: Account.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.3  2011/01/18 12:20:07  willuhn
- * @B Limit-Angaben in Umsatz- und Protokoll-Liste falsch
- *
- * Revision 1.2  2010/02/26 16:19:43  willuhn
- * @N Konten loeschen
- *
- * Revision 1.1  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- **********************************************************************/
