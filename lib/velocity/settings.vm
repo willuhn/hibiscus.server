@@ -219,7 +219,7 @@
         Wenn Du via <a class="external" href="http://de.wikipedia.org/wiki/XML-RPC">XML-RPC</a> von
         einem Fremd-System aus auf die Daten des Payment-Servers zugreifen möchtest (z.Bsp. für den
         Zugriff auf die abgerufenen Kontoauszüge oder zum Anlegen neuer Überweisungen), dann aktiviere
-        die gewünschten Services. Im <a class="external" href="http://www.willuhn.de/doku.php?id=develop:xmlrpc#xml-rpc-aufrufe_im_detail">Hibiscus-Wiki</a>
+        die gewünschten Services. Im <a class="external" href="http://www.willuhn.de/wiki/doku.php?id=develop:xmlrpc#xml-rpc-aufrufe_im_detail">Hibiscus-Wiki</a>
         findest Du detaillierte Beschreibungen der möglichen Aufrufe. Wenn Du keinen XML-RPC-Zugriff
         benötigst, dann deaktiviere alle Services.
         <br/><br/>
