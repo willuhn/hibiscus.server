@@ -13,8 +13,6 @@ package de.willuhn.jameica.hbci.payment.web.beans;
 
 import java.util.Date;
 
-import org.kapott.hbci.manager.HBCIUtils;
-
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.payment.Plugin;
@@ -52,7 +50,7 @@ public class Format
    */
   public String getInstitut(String blz) throws Exception
   {
-    String name = HBCIUtils.getNameForBLZ(blz);
+    String name = HBCIProperties.getNameForBank(blz);
     if (name != null && name.length() > 0)
       return i18n.tr("{0} (BLZ {1})", new String[]{name,blz});
     return blz;
