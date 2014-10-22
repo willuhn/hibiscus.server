@@ -46,7 +46,6 @@
               <tr><td><input type="checkbox" name="last"      value="1" #if($options.syncLastschriften) checked #end> Überfällige Lastschriften einziehen</td></tr>
               <tr><td><input type="checkbox" name="foreign"   value="1" #if($options.syncAuslandsUeberweisungen) checked #end> Überfällige SEPA-Überweisungen absenden</td></tr>
               <tr><td><input type="checkbox" name="sepalast"  value="1" #if($options.syncSepaLastschriften) checked #end> Überfällige SEPA-Lastschriften absenden</td></tr>
-              <tr><td><input type="checkbox" name="dauer"     value="1" #if($options.syncDauerauftraege) checked #end> Daueraufträge synchronisieren</td></tr>
               <tr><td><input type="checkbox" name="sepadauer" value="1" #if($options.syncSepaDauerauftraege) checked #end> SEPA-Daueraufträge synchronisieren</td></tr>
               <tr>
                 <td><input type="submit" onclick="document.form1.action.value='store'" value="Speichern"></td>
