@@ -117,7 +117,6 @@ public class Account
     options.setSyncSaldo(request.getParameter("saldo") != null);
     options.setSyncKontoauszuege(request.getParameter("umsatz") != null);
     options.setSyncUeberweisungen(request.getParameter("ueb") != null);
-    options.setSyncLastschriften(request.getParameter("last") != null);
     options.setSyncSepaDauerauftraege(request.getParameter("sepadauer") != null);
     options.setSyncAuslandsUeberweisungen(request.getParameter("foreign") != null);
     options.setSyncSepaLastschriften(request.getParameter("sepalast") != null);
