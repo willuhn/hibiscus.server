@@ -78,7 +78,7 @@ public abstract class AbstractPassports
 
         Logger.debug("found account " + k.getKontonummer());
 
-        Logger.info("checking if allready exists");
+        Logger.info("checking if already exists");
         if (k.isNewObject())
         {
           // Konto neu anlegen
@@ -98,7 +98,7 @@ public abstract class AbstractPassports
         }
         else
         {
-          Logger.info("allready exists");
+          Logger.info("already exists");
         }
         list.add(k);
       }

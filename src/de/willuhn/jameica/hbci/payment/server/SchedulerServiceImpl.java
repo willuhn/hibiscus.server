@@ -76,7 +76,7 @@ public class SchedulerServiceImpl extends UnicastRemoteObject implements Schedul
   {
     if (isStarted())
     {
-      Logger.warn("service allready started, skipping request");
+      Logger.warn("service already started, skipping request");
       return;
     }
     
