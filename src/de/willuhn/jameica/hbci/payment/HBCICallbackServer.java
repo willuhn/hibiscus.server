@@ -101,8 +101,6 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
    */
   public void callback(HBCIPassport passport, int reason, String msg, int datatype, StringBuffer retData)
   {
-    cacheData(passport);
-
     // Ueberschrieben, um die Passwort-Abfragen abzufangen und die Werte
     // zu speichern.
     switch (reason) {
