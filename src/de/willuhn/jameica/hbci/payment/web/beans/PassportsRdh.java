@@ -239,11 +239,14 @@ public class PassportsRdh extends AbstractPassports
           // Synchronisierung der Konten komplett deaktivieren - wuerde sonst nur Fehler liefern, weil
           // das Sicherheitsmedium nicht mehr da ist
           Konto[] konten = k.getKonten();
-          for (Konto konto:konten)
+          if (konten != null)
           {
-            Logger.info("disable all synchronize options for account [id: " + konto.getID() + "]");
-            SynchronizeOptions options = new SynchronizeOptions(konto);
-            options.setAll(false);
+            for (Konto konto:konten)
+            {
+              Logger.info("disable all synchronize options for account [id: " + konto.getID() + "]");
+              SynchronizeOptions options = new SynchronizeOptions(konto);
+              options.setAll(false);
+            }
           }
 
           RDHKeyFactory.removeKey(k);
