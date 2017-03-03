@@ -207,6 +207,8 @@
     <delete dir="../hibiscus.server/releases/${define.server.name}" />
   </target>
 
+  <target depends="init,build,copy,pack,clean" description="build an un-official release" name="fast" />
+
   <target depends="init,build,copy,pack,sign,clean" description="build an official release" name="all" />
 
   <target depends="init,build-nightly,copy,pack" description="build nightly build" name="nightly">
