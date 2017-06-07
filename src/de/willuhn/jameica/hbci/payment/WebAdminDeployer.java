@@ -1,13 +1,8 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/WebAdminDeployer.java,v $
- * $Revision: 1.2 $
- * $Date: 2012/06/03 13:47:45 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
+ * Copyright (c) by Olaf Willuhn
  * All rights reserved
+ * GPLv2
  *
  **********************************************************************/
 
@@ -15,12 +10,12 @@ package de.willuhn.jameica.hbci.payment;
 
 import java.io.File;
 
-import org.mortbay.jetty.security.UserRealm;
+import org.eclipse.jetty.security.LoginService;
 
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.deploy.AbstractWebAppDeployer;
-import de.willuhn.jameica.webadmin.server.JameicaUserRealm;
+import de.willuhn.jameica.webadmin.server.JameicaLoginService;
 
 /**
  * Deployer fuer das Hibiscus-Webfrontend.
@@ -55,33 +50,14 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
   }
 
   /**
-   * @see de.willuhn.jameica.webadmin.deploy.AbstractWebAppDeployer#getUserRealm()
+   * @see de.willuhn.jameica.webadmin.deploy.AbstractWebAppDeployer#getLoginService()
    */
-  protected UserRealm getUserRealm()
+  @Override
+  protected LoginService getLoginService()
   {
     if (!Settings.isLoginEnabled())
       return null;
-    return new JameicaUserRealm();
+    return new JameicaLoginService();
   }
 
 }
-
-
-/*********************************************************************
- * $Log: WebAdminDeployer.java,v $
- * Revision 1.2  2012/06/03 13:47:45  willuhn
- * @N Login via Config abschaltbar - siehe http://www.onlinebanking-forum.de/phpBB2/viewtopic.php?t=14386
- *
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.3  2009/03/30 13:09:02  willuhn
- * *** empty log message ***
- *
- * Revision 1.2  2007/12/04 12:07:17  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2007/05/16 16:26:04  willuhn
- * @N Webfrontend
- *
- **********************************************************************/
