@@ -31,7 +31,6 @@ import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Nachricht;
 import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
-import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -184,12 +183,6 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         {
           Logger.error("unable to store system message",e);
         }
-        return;
-
-      case NEED_INFOPOINT_ACK:
-        QueryMessage qm = new QueryMessage(msg,retData);
-        Application.getMessagingFactory().getMessagingQueue("hibiscus.infopoint").sendSyncMessage(qm);
-        retData.replace(0,retData.length(),qm.getData() == null ? "" : "false");
         return;
 
       case HAVE_IBAN_ERROR:
