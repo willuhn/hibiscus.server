@@ -40,11 +40,12 @@
         
             <table class="data">
               <tr><th>Geschäftsvorfall</th></tr>
-              <tr><td><input type="checkbox" name="saldo"     value="1" #if($options.syncSaldo) checked #end> Saldo abrufen</td></tr>
-              <tr><td><input type="checkbox" name="umsatz"    value="1" #if($options.syncKontoauszuege) checked #end> Kontoauszüge (Umsätze) abrufen</td></tr>
-              <tr><td><input type="checkbox" name="foreign"   value="1" #if($options.syncAuslandsUeberweisungen) checked #end> Überfällige SEPA-Überweisungen absenden</td></tr>
-              <tr><td><input type="checkbox" name="sepalast"  value="1" #if($options.syncSepaLastschriften) checked #end> Überfällige SEPA-Lastschriften absenden</td></tr>
-              <tr><td><input type="checkbox" name="sepadauer" value="1" #if($options.syncSepaDauerauftraege) checked #end> SEPA-Daueraufträge synchronisieren</td></tr>
+              <tr><td><input type="checkbox" name="saldo"       value="1" #if($options.syncSaldo) checked #end> Saldo abrufen</td></tr>
+              <tr><td><input type="checkbox" name="umsatz"      value="1" #if($options.syncKontoauszuege) checked #end> Umsätze abrufen</td></tr>
+              <tr><td><input type="checkbox" name="kontoauszug" value="1" #if($options.syncKontoauszuegePdf) checked #end> Elektr. Kontoauszüge abrufen</td></tr>
+              <tr><td><input type="checkbox" name="foreign"     value="1" #if($options.syncAuslandsUeberweisungen) checked #end> Überfällige SEPA-Überweisungen absenden</td></tr>
+              <tr><td><input type="checkbox" name="sepalast"    value="1" #if($options.syncSepaLastschriften) checked #end> Überfällige SEPA-Lastschriften absenden</td></tr>
+              <tr><td><input type="checkbox" name="sepadauer"   value="1" #if($options.syncSepaDauerauftraege) checked #end> SEPA-Daueraufträge synchronisieren</td></tr>
               <tr>
                 <td><input type="submit" onclick="document.form1.action.value='store'" value="Speichern"></td>
               </tr>

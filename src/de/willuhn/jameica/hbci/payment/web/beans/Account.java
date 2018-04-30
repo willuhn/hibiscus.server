@@ -119,6 +119,7 @@ public class Account
     options.setSyncSepaDauerauftraege(request.getParameter("sepadauer") != null);
     options.setSyncAuslandsUeberweisungen(request.getParameter("foreign") != null);
     options.setSyncSepaLastschriften(request.getParameter("sepalast") != null);
+    options.setSyncKontoauszuegePdf(request.getParameter("kontoauszug") != null);
     Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Synchronisierungsoptionen gespeichert"),StatusBarMessage.TYPE_SUCCESS));
   }
   
