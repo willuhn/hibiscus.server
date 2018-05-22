@@ -67,8 +67,7 @@
   	<!-- Jameica -->
   	<unzip dest="releases/${define.server.name}">
   		<fileset dir="../jameica/releases">
-  			<include name="**/jameica.zip"/>
-        <include name="**/jameica-*-nightly.zip"/>
+  			<include name="**/jameica-${plugin.version}.zip"/>
   	  </fileset>
   	</unzip>
   	<move todir="releases/${define.server.name}">
@@ -90,7 +89,6 @@
         <exclude name="*.exe" />
         <exclude name="*.bat" />
         <exclude name="jameica.sh" />
-        <exclude name="COPYING" />
         <exclude name="README" />
         <exclude name="*.plist" />
         <exclude name="Jameica.icns" />
@@ -130,8 +128,7 @@
     <!-- hibiscus -->
     <unzip dest="releases/${define.server.name}/plugins">
       <fileset dir="../hibiscus/releases">
-        <include name="**/hibiscus.zip"/>
-        <include name="**/hibiscus-*-nightly.zip"/>
+        <include name="**/hibiscus-${plugin.version}.zip"/>
       </fileset>
     </unzip>
     <!-- hibiscus.xmlrpc -->
