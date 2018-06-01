@@ -32,6 +32,7 @@ import de.willuhn.io.FileFinder;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.passports.ddv.DDVConfig;
+import de.willuhn.jameica.hbci.passports.pintan.PtSecMech;
 import de.willuhn.jameica.hbci.passports.pintan.rmi.PinTanConfig;
 import de.willuhn.jameica.hbci.passports.pintan.server.PinTanConfigImpl;
 import de.willuhn.jameica.hbci.passports.rdh.RDHKeyFactory;
@@ -158,10 +159,11 @@ public class Settings
         // Checken, ob wir ein fest vorgegebenes TAN-Verfahren haben
         HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
         PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
-        String secMech = config.getSecMech();
+        PtSecMech mech = config.getCurrentSecMech();
+        String secMech = mech != null ? mech.getId() : null;
         if (secMech != null && secMech.length() > 0)
         {
-          Logger.info("using pintan secmech from passport config: " + secMech);
+          Logger.info("using pintan secmech from passport config: " + mech);
           return secMech;
         }
         
