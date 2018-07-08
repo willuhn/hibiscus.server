@@ -95,12 +95,12 @@
     </tr>
     <tr>
       <td>Benutzerkennung</td>
-      <td><input type="text" name="benutzerkennung" value="$!c.currentConfig.customerId" #if($c.currentConfig)readonly#end></td>
+      <td><input type="text" name="benutzerkennung" value="$!c.currentConfig.userId" #if($c.currentConfig)readonly#end></td>
     </tr>
     <tr>
       <td>Kundenkennung</td>
       <td>
-        <input type="text" name="kundenkennung" value="$!c.currentConfig.userId" #if($c.currentConfig)readonly#end>
+        <input type="text" name="kundenkennung" value="$!c.currentConfig.customerId" #if($c.currentConfig)readonly#end>
         <span class="comment">meist identisch mit Benutzerkennung</span>
       </td>
     </tr>
