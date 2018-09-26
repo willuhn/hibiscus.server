@@ -16,11 +16,16 @@ import javax.servlet.http.HttpServletResponse;
 import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.hbci.HBCIProperties;
+import de.willuhn.jameica.hbci.MetaKey;
 import de.willuhn.jameica.hbci.Settings;
 import de.willuhn.jameica.hbci.SynchronizeOptions;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
+import de.willuhn.jameica.hbci.server.BPDUtil;
+import de.willuhn.jameica.hbci.server.BPDUtil.Query;
+import de.willuhn.jameica.hbci.server.BPDUtil.Support;
+import de.willuhn.jameica.hbci.server.KontoUtil;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.annotation.Request;
@@ -120,6 +125,9 @@ public class Account
     options.setSyncAuslandsUeberweisungen(request.getParameter("foreign") != null);
     options.setSyncSepaLastschriften(request.getParameter("sepalast") != null);
     options.setSyncKontoauszuegePdf(request.getParameter("kontoauszug") != null);
+
+    boolean camt = request.getParameter("camt") != null;
+    MetaKey.UMSATZ_CAMT.set(konto,Boolean.toString(camt));
     Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Synchronisierungsoptionen gespeichert"),StatusBarMessage.TYPE_SUCCESS));
   }
   
@@ -131,6 +139,27 @@ public class Account
   public SynchronizeOptions getOptions() throws RemoteException
   {
     return new SynchronizeOptions(this.konto);
+  }
+  
+  /**
+   * Liefert true, wenn der Umsatzabruf per CAMT fuer das Konto aktiv ist.
+   * @return true, wenn der Umsatzabruf per CAMT fuer das Konto aktiv ist.
+   * @throws RemoteException
+   */
+  public boolean isUseCamt() throws RemoteException
+  {
+    return KontoUtil.useCamt(this.konto,false);
+  }
+  
+  /**
+   * Prueft, ob das Konto ueberhaupt CAMT unterstuetzt.
+   * @return true, wenn das Konto CAMT unterstuetzt.
+   * @throws RemoteException
+   */
+  public boolean isSupportsCamt() throws RemoteException
+  {
+    Support support = BPDUtil.getSupport(this.konto,Query.UmsatzCamt);
+    return support != null && support.isSupported();
   }
 
 }

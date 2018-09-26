@@ -11,10 +11,37 @@
   }
 </style>
 
+<script type="text/javascript">
+  
+  $(document).ready(function() {
+
+    // Automatisches Lookup der Server-Adresse bei Eingabe der BLZ
+    var url = $("input[name='url']");
+    if (url.val() == "")
+    {
+      $("input[name='blz']").on("change",function() {
+        var text = $(this).val();
+        if (text.length < 4)
+          return;
+        $.ajax({url: "/webadmin/rest/hibiscus/bank/search?q=" + text, dataType: "json"}).done(function(data) {
+          if (data.length > 0)
+          {
+            var first = data[0];
+            if (first.pinTanAddress)
+              url.val(first.pinTanAddress.replace("https://",""));
+          }
+        });
+      });
+    }
+  });
+
+</script>
+
+
 <div id="breadcrumbs">
   <a href="/hibiscus/">Home</a>
   &raquo;
-  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+  <a href="passports.html">Bank-Zugänge verwalten</a>
   &raquo;
   <a href="passports.pintan.html">$c.name</a>
 </div>

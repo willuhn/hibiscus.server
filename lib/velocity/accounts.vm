@@ -47,7 +47,7 @@
             </tr>
           #end
         #else
-          <tr><td colspan="7">Keine Konten vorhanden, bitte richte zuerst ein <a href="passports.html">HBCI-Sicherheitsmedium</a> ein</td></tr>
+          <tr><td colspan="7">Keine Konten vorhanden, bitte richte zuerst einen <a href="passports.html">Bank-Zugang</a> ein</td></tr>
         #end
       </table>
 

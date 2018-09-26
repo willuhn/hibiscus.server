@@ -48,7 +48,7 @@
       <h2>Aufgaben</h2>
       <ul class="navi">
         <li><a href="settings.html"><img src="img/document-properties.png" width="16" height="16" border="0" style="margin-right: 5px">System-Einstellungen ändern...</a></li>
-        <li><a href="passports.html"><img src="img/mail-send-receive.png" width="16" height="16" border="0" style="margin-right: 5px">HBCI-Sicherheitsmedien verwalten...</a></li>
+        <li><a href="passports.html"><img src="img/mail-send-receive.png" width="16" height="16" border="0" style="margin-right: 5px">Bank-Zugänge verwalten...</a></li>
         <li><a href="accounts.html"><img src="img/system-file-manager.png" width="16" height="16" border="0" style="margin-right: 5px">Konten verwalten...</a></li>
         <li><a href="/webadmin/"><img src="img/computer.png" width="16" height="16" border="0" style="margin-right: 5px">Jameica Systemkonfiguration...</a></li>
       </ul>

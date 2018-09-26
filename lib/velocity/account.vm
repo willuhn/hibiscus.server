@@ -23,6 +23,18 @@
     document.form1.elements.action.value = "delete";
     document.form1.submit();
   }
+  
+  $(document).ready(function() {
+  
+    #if($c.supportsCamt)
+      $("input[name='umsatz']").on("change",function() {
+        $("\#camt").toggle($(this).is(":checked"));
+      });
+    
+      // einmal initial ausloesn
+      $("input[name='umsatz']").trigger("change");
+    #end
+  });
 
 </script>
 
@@ -41,7 +53,12 @@
             <table class="data">
               <tr><th>Geschäftsvorfall</th></tr>
               <tr><td><input type="checkbox" name="saldo"       value="1" #if($options.syncSaldo) checked #end> Saldo abrufen</td></tr>
-              <tr><td><input type="checkbox" name="umsatz"      value="1" #if($options.syncKontoauszuege) checked #end> Umsätze abrufen</td></tr>
+              <tr><td>
+                <input type="checkbox" name="umsatz"      value="1" #if($options.syncKontoauszuege) checked #end> Umsätze abrufen
+                <div id="camt" style="display:none">
+                  <input type="checkbox" name="camt" value="1" #if($c.useCamt) checked #end> Umsätze im neuen SEPA CAMT-Format abrufen
+                </div>
+              </td></tr>
               <tr><td><input type="checkbox" name="kontoauszug" value="1" #if($options.syncKontoauszuegePdf) checked #end> Elektr. Kontoauszüge abrufen</td></tr>
               <tr><td><input type="checkbox" name="foreign"     value="1" #if($options.syncAuslandsUeberweisungen) checked #end> Überfällige SEPA-Überweisungen absenden</td></tr>
               <tr><td><input type="checkbox" name="sepalast"    value="1" #if($options.syncSepaLastschriften) checked #end> Überfällige SEPA-Lastschriften absenden</td></tr>

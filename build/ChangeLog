@@ -1,3 +1,10 @@
+2018-09-26 Version 2.8.1
+
+  * Neues Release basierend auf Jameica 2.8.2 und Hibiscus 2.8.4
+  * Auto-Complete der Server-Adresse nach Eingabe der BLZ bei PIN/TAN
+  * "HBCI-Sicherheitsmedien" in "Bank-Zugänge" umbenannt
+  * Umsatzabruf im CAMT-Format einstellbar
+
 2018-05-22 Version 2.8.0
 
   * Neues Release basierend auf Jameica 2.8.0 und Hibiscus 2.8.0

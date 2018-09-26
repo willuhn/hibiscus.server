@@ -3,14 +3,14 @@
 <div id="breadcrumbs">
   <a href="/hibiscus/">Home</a>
   &raquo;
-  <a href="passports.html">HBCI-Sicherheitsmedien verwalten</a>
+  <a href="passports.html">Bank-Zugänge verwalten</a>
 </div>
 
 <table style="width:100%">
   <tr>
     <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
 
-      <h2>HBCI-Sicherheitsmedien</h2>
+      <h2>Bank-Zugänge</h2>
       
       <table class="data">
         <tr>
@@ -31,8 +31,8 @@
       <h2>Hinweise</h2>
       
       <span class="comment">
-        Wähle bitte das gewünschte HBCI-Sicherheitsmedium aus.
-        Nach erfolgreicher Anlage der Zugangs-Konfiguration werden die
+        Wähle bitte den gewünschten Bank-Zugang aus.
+        Nach erfolgreicher Anlage der Zugangskonfiguration werden die
         zugeordneten Konten automatisch erstellt.
       </span>
     </td>
