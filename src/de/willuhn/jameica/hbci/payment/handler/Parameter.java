@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/handler/Parameter.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
