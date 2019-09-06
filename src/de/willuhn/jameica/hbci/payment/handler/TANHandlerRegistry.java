@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/handler/TANHandlerRegistry.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -180,14 +177,3 @@ public class TANHandlerRegistry implements MessageConsumer
     tm.setTAN(tan);
   }
 }
-
-
-/*********************************************************************
- * $Log: TANHandlerRegistry.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.1  2007/09/05 16:14:23  willuhn
- * @N TAN-Support via XML-RPC Callback Handler
- *
- **********************************************************************/
