@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/Settings.java,v $
- * $Revision: 1.3 $
- * $Date: 2012/06/03 13:47:45 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -215,6 +212,28 @@ public class Settings
     Logger.info("using default pintan secmech: " + defaultSecMech);
     return defaultSecMech;
   }
+  
+  /**
+   * Liefert die TAN-Medienbezeichnung.
+   * Es findet keine Benutzerinteraktion statt. Wenn sie nicht ermittelbar ist, wird NULL geliefert.
+   * @param passport der HBCI-Passport.
+   * @return PIN/TAN-Medienbezeichnung.
+   */
+  public static String getPinTanMedia(HBCIPassport passport)
+  {
+    try
+    {
+      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
+      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      return config.getTanMedia();
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to determin tan media name",e);
+    }
+    return null;
+  }
+
   
   /**
    * Liefert die Beginn-Uhrzeit, ab der der Scheduler aussetzen soll.
@@ -552,77 +571,3 @@ public class Settings
     }
   }
 }
-
-
-/*********************************************************************
- * $Log: Settings.java,v $
- * Revision 1.3  2012/06/03 13:47:45  willuhn
- * @N Login via Config abschaltbar - siehe http://www.onlinebanking-forum.de/phpBB2/viewtopic.php?t=14386
- *
- * Revision 1.2  2012/03/28 22:28:09  willuhn
- * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
- * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
- *
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.36  2011/10/25 13:57:16  willuhn
- * @R Saemtliche Lizenz-Checks entfernt - ist jetzt Opensource
- *
- * Revision 1.35  2011/09/28 16:49:34  willuhn
- * @C Nur die Konten in die Zaehlung der Lizenzpruefung aufnehmen, fuer die auch Sync-Einstellungen vorgenommen wurden
- *
- * Revision 1.34  2011/04/06 08:50:19  willuhn
- * *** empty log message ***
- *
- * Revision 1.33  2011/04/06 08:35:20  willuhn
- * @C Bei RSA-Engine bleiben, wenn Migration auf AES fehlschlaegt
- *
- * Revision 1.32  2011/02/09 16:28:36  willuhn
- * @N Wallet-Engine konfigurierbar
- *
- * Revision 1.31  2011/02/09 13:49:07  willuhn
- * @C Migration des Wallet auf AES-Engine
- *
- * Revision 1.30  2010/11/08 11:38:48  willuhn
- * @B Beim Ermitteln der TAN-Verfahren kann initial eine Rekursion auftreten
- *
- * Revision 1.29  2010/11/08 10:56:28  willuhn
- * *** empty log message ***
- *
- * Revision 1.28  2010/11/04 17:25:29  willuhn
- * @N Upload des Lizenzschluessels uebers Webfrontend
- *
- * Revision 1.27  2010/11/04 13:28:26  willuhn
- * @N Lizenzbedingungen muessen nun explizit im Browser akzeptiert werden
- *
- * Revision 1.26  2010/10/07 12:30:00  willuhn
- * @B Fehlerhafte Pruefung bei unbegrenzten Lizenzen
- *
- * Revision 1.25  2010/10/07 12:20:28  willuhn
- * @N Lizensierungsumfang (Anzahl der zulaessigen Konten) konfigurierbar
- *
- * Revision 1.24  2010/09/22 15:04:55  willuhn
- * @N PIN/TAN-Verfahren aus Passport lesen
- *
- * Revision 1.23  2010/09/10 15:52:29  willuhn
- * @N Umstellung auf Multi-DDV-Support - Migration der Passport-Dateien
- *
- * Revision 1.22  2010/09/08 14:54:03  willuhn
- * @N Umstellung auf Multi-DDV-Support
- *
- * Revision 1.21  2010/06/14 11:22:34  willuhn
- * @N Benachrichtigungs-URL, mit der ein Fremd-System darueber informiert werden kann, wenn die Synchronisierung eines Kontos lief
- *
- * Revision 1.20  2010/05/17 12:44:30  willuhn
- * @N Einzelne Wochentage koennen nun von der Synchronisierung ausgeschlossen werden. Ist z.Bsp. sinnvoll, wenn die Bank am Wochenende eher schlecht/gar nicht erreichbar ist
- *
- * Revision 1.19  2010/02/11 11:25:41  willuhn
- * @N log license status
- *
- * Revision 1.18  2010/02/10 22:28:15  willuhn
- * @B CLassCastException
- *
- * Revision 1.17  2010/02/10 16:37:36  willuhn
- * @N Passworte auch fuer RDHX-Passports speichern
- **********************************************************************/

@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/HBCICallbackServer.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -169,6 +166,17 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         retData.replace(0,retData.length(),pw);
         return;
 
+      case NEED_PT_TANMEDIA:
+        Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
+        String name = Settings.getPinTanMedia(passport);
+        if (name != null && name.length() > 0)
+        {
+          retData.replace(0,retData.length(),name);
+          return;
+        }
+        // Wenn wir die Daten nicht gespeichert haben, soll es der Parent-Callback behandeln
+        break;
+        
       // Implementiert, weil die Console-Impl Eingaben von STDIN erfordern
       case HAVE_INST_MSG:
         try
