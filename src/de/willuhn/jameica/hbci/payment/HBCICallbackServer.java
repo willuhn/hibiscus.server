@@ -126,8 +126,16 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
       case NEED_PT_SECMECH:
         Logger.info("GOT PIN/TAN secmech list: " + msg + " ["+retData.toString()+"]");
-        retData.replace(0,retData.length(),Settings.getPinTanSecMech(passport,retData.toString()));
-        return;
+        final String secmech = Settings.getPinTanSecMech(passport,retData.toString());
+        
+        if (secmech != null && secmech.length() > 0)
+        {
+          Logger.info("using stored secmech: " + secmech);
+          retData.replace(0,retData.length(),secmech);
+          return;
+        }
+        // Faellt durch bis zum Parent
+        break;
         
       case NEED_PT_TAN:
         Logger.info("sending TAN message");
@@ -138,14 +146,15 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
         TANMessage tm = new TANMessage(msg, passport, konto);
         Application.getMessagingFactory().sendSyncMessage(tm);
-        String tan = tm.getTAN();
-        if (tan == null || tan.length() == 0)
-          throw new HBCI_Exception("No TAN-handler specified or empty TAN returned");
-          
-        Logger.info("got TAN message response, sending to institute");
-        retData.replace(0,retData.length(),tan);
-        return;
-      ///////////////////////////////////////////////////////////////
+        final String tan = tm.getTAN();
+        if (tan != null && tan.length() > 0)
+        {
+          Logger.info("got TAN message response, using TAN");
+          retData.replace(0,retData.length(),tan);
+          return;
+        }
+        // Faellt durch bis zum Parent
+        break;
         
         
       case NEED_CONNECTION:
@@ -158,23 +167,27 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
       case NEED_PASSPHRASE_SAVE:
       case NEED_SOFTPIN:
       case NEED_PT_PIN:
-        String pw = Settings.getHBCIPassword(passport,reason);
-        if (pw == null || pw.length() == 0)
-          throw new RuntimeException("no password/pin found for passport " + passport.getClass().getName());
+        final String pw = Settings.getHBCIPassword(passport,reason);
+        if (pw != null && pw.length() > 0)
+        {
+          Logger.info("using stored pin");
+          retData.replace(0,retData.length(),pw);
+          return;
+        }
+        // Faellt durch bis zum Parent
+        break;
 
-        // Wir haben ein gespeichertes Passwort. Das nehmen wir.
-        retData.replace(0,retData.length(),pw);
-        return;
 
       case NEED_PT_TANMEDIA:
         Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
-        String name = Settings.getPinTanMedia(passport);
+        final String name = Settings.getPinTanMedia(passport);
         if (name != null && name.length() > 0)
         {
+          Logger.info("using stored tan media name: " + name);
           retData.replace(0,retData.length(),name);
           return;
         }
-        // Wenn wir die Daten nicht gespeichert haben, soll es der Parent-Callback behandeln
+        // Faellt durch bis zum Parent
         break;
         
       // Implementiert, weil die Console-Impl Eingaben von STDIN erfordern
@@ -219,6 +232,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         throw new HBCI_Exception("hard pin not allowed in payment server");
 
       case HBCICallback.NEED_REMOVE_CHIPCARD:
+        return;
 
         // Implementiert, weil die Console-Impl Eingaben von STDIN erfordern
       case HAVE_ERROR:
