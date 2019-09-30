@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/web/beans/Settings.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -26,12 +23,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.n3.nanoxml.IXMLElement;
-import net.n3.nanoxml.IXMLParser;
-import net.n3.nanoxml.StdXMLReader;
-import net.n3.nanoxml.XMLElement;
-import net.n3.nanoxml.XMLParserFactory;
-import net.n3.nanoxml.XMLWriter;
 import de.willuhn.datasource.Service;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.payment.Plugin;
@@ -44,6 +35,12 @@ import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.xmlrpc.rmi.XmlRpcServiceDescriptor;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.I18N;
+import net.n3.nanoxml.IXMLElement;
+import net.n3.nanoxml.IXMLParser;
+import net.n3.nanoxml.StdXMLReader;
+import net.n3.nanoxml.XMLElement;
+import net.n3.nanoxml.XMLParserFactory;
+import net.n3.nanoxml.XMLWriter;
 
 
 /**
@@ -411,7 +408,16 @@ public class Settings
   {
     getRule().setEnabled("true".equalsIgnoreCase(notifyEnabled));
   }
-
+  
+  /**
+   * Prueft, ob die CRC-Pruefung bei Konten stattfinden soll.
+   * @return true, wenn die CRC-Pruefung bei Konten stattfinden soll.
+   */
+  public boolean getKontoCheck()
+  {
+    return de.willuhn.jameica.hbci.Settings.getKontoCheck();
+  }
+  
   /**
    * Laedt die Benachrichtigungseinstellungen.
    */
@@ -511,6 +517,7 @@ public class Settings
     // Im folgenden nur die Checkboxen. Alle anderen Optionen werden direkt
     // via Setter gespeichert.
     de.willuhn.jameica.hbci.payment.Settings.setStopSchedulerOnError(request.getParameter("stopSchedulerOnError") != null);
+    de.willuhn.jameica.hbci.Settings.setKontoCheck(request.getParameter("kontocheck") != null);
     de.willuhn.jameica.hbci.payment.Settings.setSchedulerExcludeDay(Calendar.MONDAY,   request.getParameter("schedulerExcludeMon") != null);
     de.willuhn.jameica.hbci.payment.Settings.setSchedulerExcludeDay(Calendar.TUESDAY,  request.getParameter("schedulerExcludeTue") != null);
     de.willuhn.jameica.hbci.payment.Settings.setSchedulerExcludeDay(Calendar.WEDNESDAY,request.getParameter("schedulerExcludeWed") != null);
@@ -598,32 +605,3 @@ public class Settings
   }
 
 }
-
-
-/**********************************************************************
- * $Log: Settings.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.7  2011/01/26 18:37:10  willuhn
- * @N XML-RPC-Einstellungen
- *
- * Revision 1.6  2010/06/14 11:22:33  willuhn
- * @N Benachrichtigungs-URL, mit der ein Fremd-System darueber informiert werden kann, wenn die Synchronisierung eines Kontos lief
- *
- * Revision 1.5  2010/05/17 12:44:30  willuhn
- * @N Einzelne Wochentage koennen nun von der Synchronisierung ausgeschlossen werden. Ist z.Bsp. sinnvoll, wenn die Bank am Wochenende eher schlecht/gar nicht erreichbar ist
- *
- * Revision 1.4  2010/04/08 12:40:02  willuhn
- * *** empty log message ***
- *
- * Revision 1.3  2010/03/24 12:09:47  willuhn
- * @N GUI-Polishing
- *
- * Revision 1.2  2010/03/23 18:35:32  willuhn
- * @N Mail-Benachrichtigung (jameica.sensors) via Webfrontend konfigurierbar
- *
- * Revision 1.1  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- **********************************************************************/

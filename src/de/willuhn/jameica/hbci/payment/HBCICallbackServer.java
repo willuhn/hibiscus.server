@@ -126,17 +126,73 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
       case NEED_PT_SECMECH:
         Logger.info("GOT PIN/TAN secmech list: " + msg + " ["+retData.toString()+"]");
-        final String secmech = Settings.getPinTanSecMech(passport,retData.toString());
+        
+        // Checken, ob wir den Wert in der Session haben
+        String secmech = (String) PassportsPinTan.SESSION.get(new Integer(reason));
+        if (secmech != null && secmech.length() > 0)
+        {
+          // wir haben den Wert in der Session. Da wir jetzt auch den Passport haben, koennen wir den Wert gleich abspeichern
+          Settings.setPinTanSecMech(passport,secmech);
+          // Aus der Session entfernen - wir haben es ja jetzt fest gespeichert
+          PassportsPinTan.SESSION.remove(new Integer(reason));
+        }
+        else
+        {
+          // Checken, ob wir ihn schon in der Config haben
+          secmech = Settings.getPinTanSecMech(passport,retData.toString());
+        }
+        
         
         if (secmech != null && secmech.length() > 0)
         {
-          Logger.info("using stored secmech: " + secmech);
+          Logger.info("using secmech: " + secmech);
           retData.replace(0,retData.length(),secmech);
           return;
         }
-        // Faellt durch bis zum Parent
-        break;
         
+        // Parent fragen
+        parent.callback(passport, reason, msg, datatype, retData);
+        if (retData != null && retData.length() > 0)
+        {
+          // Gleich abspeichern
+          Settings.setPinTanSecMech(passport,retData.toString());
+        }
+        break;
+
+      case NEED_PT_TANMEDIA:
+        Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
+        
+        // Checken, ob wir den Wert in der Session haben
+        String tanmedia = (String) PassportsPinTan.SESSION.get(new Integer(reason));
+        if (tanmedia != null && tanmedia.length() > 0)
+        {
+          // wir haben den Wert in der Session. Da wir jetzt auch den Passport haben, koennen wir den Wert gleich abspeichern
+          Settings.setPinTanMedia(passport,tanmedia);
+          // Aus der Session entfernen - wir haben es ja jetzt fest gespeichert
+          PassportsPinTan.SESSION.remove(new Integer(reason));
+        }
+        else
+        {
+          // Checken, ob wir ihn schon in der Config haben
+          tanmedia = Settings.getPinTanMedia(passport);
+        }
+
+        if (tanmedia != null && tanmedia.length() > 0)
+        {
+          Logger.info("using tan media name: " + tanmedia);
+          retData.replace(0,retData.length(),tanmedia);
+          return;
+        }
+        
+        // Parent fragen
+        parent.callback(passport, reason, msg, datatype, retData);
+        if (retData != null && retData.length() > 0)
+        {
+          // Gleich abspeichern
+          Settings.setPinTanMedia(passport,retData.toString());
+        }
+        break;
+
       case NEED_PT_TAN:
         Logger.info("sending TAN message");
         
@@ -170,26 +226,13 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         final String pw = Settings.getHBCIPassword(passport,reason);
         if (pw != null && pw.length() > 0)
         {
-          Logger.info("using stored pin");
+          Logger.debug("using stored pin");
           retData.replace(0,retData.length(),pw);
           return;
         }
         // Faellt durch bis zum Parent
         break;
 
-
-      case NEED_PT_TANMEDIA:
-        Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
-        final String name = Settings.getPinTanMedia(passport);
-        if (name != null && name.length() > 0)
-        {
-          Logger.info("using stored tan media name: " + name);
-          retData.replace(0,retData.length(),name);
-          return;
-        }
-        // Faellt durch bis zum Parent
-        break;
-        
       // Implementiert, weil die Console-Impl Eingaben von STDIN erfordern
       case HAVE_INST_MSG:
         try

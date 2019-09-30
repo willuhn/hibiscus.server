@@ -68,6 +68,10 @@
             <td><input type="text" name="hbciJobLimit" value="$c.hbciJobLimit" /> $meta.currency</td>
           </tr>
           <tr>
+            <td>Kontonummern und Bankleitzahlen mittels Prüfsumme testen</td>
+            <td><input type="checkbox" name="kontocheck" #if($c.kontoCheck) checked="checked" #end /></td>
+          </tr>
+          <tr>
             <td>&nbsp;</td>
             <td><input type="submit" value="Speichern"></td>
           </tr>

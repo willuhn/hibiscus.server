@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.kapott.hbci.callback.HBCICallback;
-import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.AbstractRDHSWFileBasedPassport;
 import org.kapott.hbci.passport.HBCIPassport;
@@ -136,13 +135,31 @@ public class Settings
   private static boolean recursion = false;
   
   /**
+   * Speichert das TAN-Verfahren in den Einstellungen des Passports.
+   * @param passport der Passport.
+   * @param value die Bezeichnung des TAN-Verfahrens.
+   */
+  public static void setPinTanSecMech(HBCIPassport passport, String value)
+  {
+    try
+    {
+      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
+      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      config.setStoredSecMech(PtSecMech.createFailsafe(value));
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to save secmech " + value + " in passport config",e);
+    }
+  }
+  
+  /**
    * Liefert das zu verwendende PIN/TAN-Sicherheitsverfahren.
    * @param passport der HBCI-Passport.
    * @param validMechs Liste der verfuegbaren Verfahren.
-   * @return PIN/TAN-Sicherheitsverfahren.
-   * @throws HBCI_Exception wenn kein TAN-Verfahren ermittelbar war.
+   * @return PIN/TAN-Sicherheitsverfahren oder NULL, wenn keines ermittelbar ist.
    */
-  public static String getPinTanSecMech(HBCIPassport passport, String validMechs) throws HBCI_Exception
+  public static String getPinTanSecMech(HBCIPassport passport, String validMechs)
   {
     // 1) Wir versuchen erstmal, das Verfahren ueber den Passport zu ermitteln
     // Achtung: ppt.getCurrentTANMethod(false) kann eine Rekursion ausloesen,
@@ -156,7 +173,9 @@ public class Settings
         // Checken, ob wir ein fest vorgegebenes TAN-Verfahren haben
         HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
         PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
-        PtSecMech mech = config.getCurrentSecMech();
+        PtSecMech mech = config.getStoredSecMech();
+        if (mech == null)
+          mech = config.getCurrentSecMech();
         String secMech = mech != null ? mech.getId() : null;
         if (secMech != null && secMech.length() > 0)
         {
@@ -196,7 +215,7 @@ public class Settings
           String secMech = s[0].substring(0,s[0].indexOf(":"));
           if (secMech.length() > 0)
           {
-            Logger.info("using pintan secmech from list: " + secMech);
+            Logger.info("using first pintan secmech from list: " + secMech);
             return secMech;
           }
         }
@@ -206,13 +225,34 @@ public class Settings
     // 3) Wir haben weder im Passport was, noch HBCI4Java konnte etwas
     // liefern. Dann halt der Default-Wert aus der Config.
     String defaultSecMech = settings.getString("pintan.secmech","900");
-    if (defaultSecMech == null || defaultSecMech.length() == 0)
-      throw new HBCI_Exception("no pintan secmech available");
+    if (defaultSecMech != null && defaultSecMech.length() > 0)
+    {
+      Logger.info("using default pintan secmech: " + defaultSecMech);
+      return defaultSecMech;
+    }
     
-    Logger.info("using default pintan secmech: " + defaultSecMech);
-    return defaultSecMech;
+    return null;
   }
-  
+
+  /**
+   * speichert die TAN-Medienbezeichnung.
+   * @param passport der HBCI-Passport.
+   * @param tanmedia die TAN-Medienbezeichnung.
+   */
+  public static void setPinTanMedia(HBCIPassport passport, String tanmedia)
+  {
+    try
+    {
+      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
+      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      config.setTanMedia(tanmedia);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to save tan media name " + tanmedia + " in passport config ",e);
+    }
+  }
+
   /**
    * Liefert die TAN-Medienbezeichnung.
    * Es findet keine Benutzerinteraktion statt. Wenn sie nicht ermittelbar ist, wird NULL geliefert.
