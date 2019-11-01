@@ -80,6 +80,7 @@
         <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
         <exclude name="**/lib/swt/win64/**"/>
+        <exclude name="jre-*/**" />
 
       	<exclude name="**/lib/splash.jar"/>
         <exclude name="**/lib/mckoi/**"/>
@@ -97,7 +98,6 @@
         <exclude name="*.plist" />
         <exclude name="Jameica.icns" />
         <exclude name="jameica-icon*" />
-        <exclude name="jre-*" />
       </fileset>
     </move>
   	<delete dir="releases/${define.server.name}/jameica"/>
