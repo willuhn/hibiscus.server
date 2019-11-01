@@ -77,6 +77,7 @@
         <include name="**"/>
       	<!-- Wir brauchen wenigstens einmal die swt.jar fuer den Classloader - auch wenn sie nicht genutzt werden -->
         <exclude name="**/lib/swt/linux64/**"/>
+        <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
         <exclude name="**/lib/swt/win64/**"/>
 
@@ -84,6 +85,7 @@
         <exclude name="**/lib/mckoi/**"/>
       	
         <exclude name="jameica*-win64*" />
+        <exclude name="jameica*-linuxarm64*" />
         <exclude name="jameica*-linux64*" />
       	<exclude name="jameica*-macos*" />
         <exclude name="jameica*-openbsd*" />
