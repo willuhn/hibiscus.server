@@ -48,7 +48,7 @@
 
 <h2>$c.name</h2>
 
-<form method="post" name="form1">
+<form method="post" name="form1" autocomplete="off">
   <input type="hidden" name="action" value="">
   <input type="hidden" name="config" value="$format.escapePath($c.currentConfig.filename)">
 
@@ -116,29 +116,29 @@
     <tr>
       <td>Bezeichnung</td>
       <td>
-        <input type="text" name="bezeichnung" value="$!c.currentConfig.bezeichnung">
+        <input type="text" name="bezeichnung" value="$!c.currentConfig.bezeichnung" autocomplete="off">
         <span class="comment">frei wählbar. Z.Bsp.: "Geschäftskonto"</span>
       </td>
     </tr>
     <tr>
       <td>Benutzerkennung</td>
-      <td><input type="text" name="benutzerkennung" value="$!c.currentConfig.userId" #if($c.currentConfig)readonly#end></td>
+      <td><input type="text" name="benutzerkennung" value="$!c.currentConfig.userId" #if($c.currentConfig)readonly#end autocomplete="off"></td>
     </tr>
     <tr>
       <td>Kundenkennung</td>
       <td>
-        <input type="text" name="kundenkennung" value="$!c.currentConfig.customerId" #if($c.currentConfig)readonly#end>
+        <input type="text" name="kundenkennung" value="$!c.currentConfig.customerId" #if($c.currentConfig)readonly#end autocomplete="off">
         <span class="comment">meist identisch mit Benutzerkennung</span>
       </td>
     </tr>
     <tr>
       <td>BLZ</td>
-      <td><input type="text" name="blz" value="$!c.currentConfig.getBLZ()" #if($c.currentConfig)readonly#end></td>
+      <td><input type="text" name="blz" value="$!c.currentConfig.getBLZ()" #if($c.currentConfig)readonly#end autocomplete="off"></td>
     </tr>
     <tr>
       <td>HTTPS-URL</td>
       <td>
-        <input type="text" name="url" value="$!c.currentConfig.getURL()" #if($c.currentConfig)readonly#end>
+        <input type="text" name="url" value="$!c.currentConfig.getURL()" #if($c.currentConfig)readonly#end autocomplete="off">
         <span class="comment">Angabe ohne "https://", z.Bsp.: "hbci.finanzit.com/cgi/hbcipt.cgi"</span>
       </td>
     </tr>
@@ -147,11 +147,11 @@
       <td>
         <select name="version">
           #set($v = $c.currentConfig.getHBCIVersion())
-          <option value="201" #if($v && $v == "201")selected#end>HBCI 2.01</option>
-          <option value="210" #if($v && $v == "210")selected#end>HBCI 2.1</option>
-          <option value="220" #if($v && $v == "220")selected#end>HBCI 2.2</option>
-          <option value="plus" #if($v && $v == "plus")selected#end>HBCI+ (HBCI 2.2 mit PIN/TAN-Unterstützung)</option>
           <option value="300" #if($v && $v == "300")selected#end>FinTS 3.0</option>
+          <option value="plus" #if($v && $v == "plus")selected#end>HBCI+ (HBCI 2.2 mit PIN/TAN-Unterstützung)</option>
+          <option value="220" #if($v && $v == "220")selected#end>HBCI 2.2</option>
+          <option value="210" #if($v && $v == "210")selected#end>HBCI 2.1</option>
+          <option value="201" #if($v && $v == "201")selected#end>HBCI 2.01</option>
         </select>
         <span class="comment">meist HBCI+</span>
       </td>
@@ -159,7 +159,7 @@
     <tr>
       <td>PIN</td>
       <td>
-        <input type="password" name="pin">
+        <input type="password" name="pin" autocomplete="off">
         #if($c.currentConfig)
           <span class="comment">freilassen, wenn die PIN nicht geändert werden soll</span>
         #end
@@ -168,10 +168,29 @@
     <tr>
       <td style="white-space:nowrap">PIN (Wiederholung)</td>
       <td>
-        <input type="password" name="pin2">
+        <input type="password" name="pin2" autocomplete="off">
         #if($c.currentConfig)
           <span class="comment">freilassen, wenn die PIN nicht geändert werden soll</span>
         #end
+      </td>
+    </tr>
+    <tr>
+      <td>TAN-Verfahren</td>
+      <td>
+        #set($secmech = $!c.currentConfig.storedSecMech)
+        #set($secmechid = "")
+        #if($secmech)
+        #set($secmechid = $secmech.id)
+        #end
+        <input type="text" name="secmech" value="$!secmechid" autocomplete="off">
+        <span class="comment">dreistellige Nummer des TAN-Verfahrens</span>
+      </td>
+    </tr>
+    <tr>
+      <td>TAN-Medienbezeichnung</td>
+      <td>
+        <input type="text" name="tanmedia" value="$!c.currentConfig.tanMedia" autocomplete="off">
+        <span class="comment">bei Postbank z.Bsp. &quot;cT:&lt;name&gt;&quot; bei ChipTAN</span>
       </td>
     </tr>
 
@@ -179,7 +198,6 @@
       <td>TAN-Handler</td>
       <td>
         <select name="tanhandler" onchange="activateHandlerDetails(this.options[this.selectedIndex].value)">
-          <option value="">[kein TAN-Handler]</option>
           #foreach($h in $c.tanHandlers)
             <option #if($c.isCurrentTanHandler($h))selected#end value="$h.class.name">$h.name</option>
           #end

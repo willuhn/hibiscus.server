@@ -1,13 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/web/beans/AbstractPassports.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -20,6 +17,7 @@ import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.passport.HBCIPassport;
 
 import de.willuhn.jameica.hbci.PassportRegistry;
+import de.willuhn.jameica.hbci.Settings;
 import de.willuhn.jameica.hbci.passport.Passport;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.rmi.Konto;
@@ -60,8 +58,13 @@ public abstract class AbstractPassports
    */
   protected Konto[] readKonten(HBCIHandler handler) throws Exception
   {
+    boolean state = false;
     try
     {
+      // Das Pruefen der Kontonummern deaktivieren wir voruebergehend - fuer den Fall, dass die Bank ungueltige Bankverbindungen liefert
+      state = Settings.getKontoCheck();
+      Settings.setKontoCheck(false);
+      
       HBCIPassport passport = handler.getPassport();
       org.kapott.hbci.structures.Konto[] konten = passport.getAccounts();
       if (konten == null || konten.length == 0)
@@ -106,6 +109,7 @@ public abstract class AbstractPassports
     }
     finally
     {
+      Settings.setKontoCheck(state);
       if (handler != null)
       {
         try
@@ -120,17 +124,3 @@ public abstract class AbstractPassports
     }
   }
 }
-
-
-/**********************************************************************
- * $Log: AbstractPassports.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.2  2010/03/04 16:13:31  willuhn
- * @N Kartenleser-Konfiguration
- *
- * Revision 1.1  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- **********************************************************************/

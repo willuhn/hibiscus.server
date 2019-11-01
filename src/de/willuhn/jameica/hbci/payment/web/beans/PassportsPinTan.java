@@ -1,11 +1,10 @@
 /**********************************************************************
- * $Source: /cvsroot/hibiscus/hibiscus.server/src/de/willuhn/jameica/hbci/payment/web/beans/PassportsPinTan.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/11/12 15:09:59 $
- * $Author: willuhn $
  *
- * Copyright (c) by willuhn - software & services
- * All rights reserved
+ * Copyright (c) 2019 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * Jameica License.  Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
@@ -15,6 +14,8 @@ import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import de.willuhn.jameica.hbci.SynchronizeOptions;
 import de.willuhn.jameica.hbci.passport.Passport;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.passports.pintan.PinTanConfigFactory;
+import de.willuhn.jameica.hbci.passports.pintan.PtSecMech;
 import de.willuhn.jameica.hbci.passports.pintan.rmi.PinTanConfig;
 import de.willuhn.jameica.hbci.passports.pintan.server.PassportHandleImpl;
 import de.willuhn.jameica.hbci.passports.pintan.server.PassportImpl;
@@ -206,6 +208,8 @@ public class PassportsPinTan extends AbstractPassports
       String url             = request.getParameter("url");
       String version         = request.getParameter("version");
       String blz             = request.getParameter("blz");
+      String secmech         = request.getParameter("secmech");
+      String tanmedia        = request.getParameter("tanmedia");
       
       if (bezeichnung == null || bezeichnung.length() == 0)
         throw new ApplicationException(i18n.tr("Bitte gib eine Bezeichnung für diese PIN/TAN-Konfiguration ein"));
@@ -275,36 +279,34 @@ public class PassportsPinTan extends AbstractPassports
       if (!update)
       {
         Logger.info("preparing callback session");
-        SESSION.put(new Integer(HBCICallback.NEED_USERID),    benutzerkennung);
-        SESSION.put(new Integer(HBCICallback.NEED_CUSTOMERID),kundenkennung);
-        SESSION.put(new Integer(HBCICallback.NEED_HOST),      url);
-        SESSION.put(new Integer(HBCICallback.NEED_BLZ),       blz);
-        SESSION.put(new Integer(HBCICallback.NEED_COUNTRY),   "DE");
-        SESSION.put(new Integer(HBCICallback.NEED_PORT),      "443");
-        SESSION.put(new Integer(HBCICallback.NEED_FILTER),    "Base64");
+        SESSION.put(new Integer(HBCICallback.NEED_USERID),      benutzerkennung);
+        SESSION.put(new Integer(HBCICallback.NEED_CUSTOMERID),  kundenkennung);
+        SESSION.put(new Integer(HBCICallback.NEED_HOST),        url);
+        SESSION.put(new Integer(HBCICallback.NEED_BLZ),         blz);
+        SESSION.put(new Integer(HBCICallback.NEED_COUNTRY),     "DE");
+        SESSION.put(new Integer(HBCICallback.NEED_PORT),        "443");
+        SESSION.put(new Integer(HBCICallback.NEED_FILTER),      "Base64");
+        SESSION.put(new Integer(HBCICallback.NEED_PT_SECMECH),  secmech);
+        SESSION.put(new Integer(HBCICallback.NEED_PT_TANMEDIA), tanmedia);
 
         Logger.info("creating pin/tan config");
         config = new PinTanConfigImpl(PinTanConfigFactory.load(f),f);
       }
-
+      else
+      {
+        // Nur beim Update direkt speichern - nicht bei der Neuanlage
+        // Bei der Neuanlage landen die Daten im Cache und werden dann
+        // im Callback gespeichert
+        config.setStoredSecMech(PtSecMech.createFailsafe(secmech));
+        config.setTanMedia(tanmedia);
+      }
+      
       // Die werden nicht via Callback abgefragt
       config.setBezeichnung(bezeichnung);
       config.setHBCIVersion(version);
         
       Logger.info("save pin/tan config");
       PinTanConfigFactory.store(config);
-
-      if (!update)
-      {
-        Logger.info("create passport handle");
-        PassportHandle handle = new PassportHandleImpl(config);
-
-        Logger.info("fetch accounts");
-        Konto[] konten = readKonten(handle.open());
-        if (konten != null)
-          config.setKonten(konten); // Konten fest verknuepfen
-        Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Konten angelegt."), StatusBarMessage.TYPE_SUCCESS));
-      }
 
       Logger.info("applying TAN handler");
       String th = request.getParameter("tanhandler");
@@ -325,6 +327,18 @@ public class PassportsPinTan extends AbstractPassports
         }
       }
       
+      if (!update)
+      {
+        Logger.info("create passport handle");
+        PassportHandle handle = new PassportHandleImpl(config);
+
+        Logger.info("fetch accounts");
+        Konto[] konten = readKonten(handle.open());
+        if (konten != null)
+          config.setKonten(konten); // Konten fest verknuepfen
+        Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Konten angelegt."), StatusBarMessage.TYPE_SUCCESS));
+      }
+
       Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Einstellungen gespeichert"), StatusBarMessage.TYPE_SUCCESS));
     }
     catch (Exception e)
@@ -429,64 +443,18 @@ public class PassportsPinTan extends AbstractPassports
         h.setConfig(path);
       }
     }
-    return Arrays.asList(list);
+    List<TANHandler> result = new ArrayList(Arrays.asList(list));
+    Collections.sort(result,new Comparator<TANHandler>() {
+      /**
+       * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+       */
+      @Override
+      public int compare(TANHandler o1, TANHandler o2)
+      {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+    return result;
   }
 }
 
-
-
-/**********************************************************************
- * $Log: PassportsPinTan.java,v $
- * Revision 1.1  2011/11/12 15:09:59  willuhn
- * @N initial import
- *
- * Revision 1.15  2011/10/25 13:57:16  willuhn
- * @R Saemtliche Lizenz-Checks entfernt - ist jetzt Opensource
- *
- * Revision 1.14  2011/05/12 17:37:20  willuhn
- * @C "https://" automatisch entfernen, falls mit eingegeben
- *
- * Revision 1.13  2011/02/09 12:30:46  willuhn
- * *** empty log message ***
- *
- * Revision 1.12  2011/02/07 10:24:36  willuhn
- * @N Aktualisieren der zu einer PIN/TAN-Konfiguration zugeordneten Konten
- *
- * Revision 1.11  2010/12/14 10:48:57  willuhn
- * *** empty log message ***
- *
- * Revision 1.10  2010/11/08 11:36:37  willuhn
- * @B NPE
- *
- * Revision 1.9  2010/10/07 12:20:28  willuhn
- * @N Lizensierungsumfang (Anzahl der zulaessigen Konten) konfigurierbar
- *
- * Revision 1.8  2010/09/08 14:54:03  willuhn
- * @N Umstellung auf Multi-DDV-Support
- *
- * Revision 1.7  2010/03/04 16:13:31  willuhn
- * @N Kartenleser-Konfiguration
- *
- * Revision 1.6  2010/02/26 16:19:43  willuhn
- * @N Konten loeschen
- *
- * Revision 1.5  2010/02/26 15:38:16  willuhn
- * @B
- *
- * Revision 1.4  2010/02/26 15:22:46  willuhn
- * @N Konten in Liste der Schluesseldisketten anzeigen
- * @N Schluesseldisketten loeschen
- * @B kleinere Bugfixes
- *
- * Revision 1.3  2010/02/23 18:21:54  willuhn
- * @N PIN/TAN-Config loeschen
- * @C Styling
- * @B debugging
- *
- * Revision 1.2  2010/02/23 17:22:04  willuhn
- * @B small pin/tan bugs
- *
- * Revision 1.1  2010/02/18 17:13:09  willuhn
- * @N Komplettes Rewrite des Webfrontends auf jameica.webtools-Plattform - endlich keine haesslichen JSPs mehr
- *
- **********************************************************************/
