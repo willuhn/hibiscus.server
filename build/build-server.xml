@@ -97,6 +97,7 @@
         <exclude name="*.plist" />
         <exclude name="Jameica.icns" />
         <exclude name="jameica-icon*" />
+        <exclude name="jre-*" />
       </fileset>
     </move>
   	<delete dir="releases/${define.server.name}/jameica"/>
