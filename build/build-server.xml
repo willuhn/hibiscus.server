@@ -80,6 +80,7 @@
         <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
         <exclude name="**/lib/swt/win64/**"/>
+        <exclude name="jre-*/**" />
 
       	<exclude name="**/lib/splash.jar"/>
         <exclude name="**/lib/mckoi/**"/>
