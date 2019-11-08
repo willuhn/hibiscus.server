@@ -1,0 +1,123 @@
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  
+  <body style="text-align:center">
+  
+    <h2>Flickercode</h2>
+    <div>
+      Beispiel-Code, um einen Flickercode auf einer HTML-Seite per Canvas darzustellen. Basierend auf <a href="https://6xq.net/flickercodes/">https://6xq.net/flickercodes/</a>.
+      <br/>
+      Beachte, dass die Breite der Leser-Einheit je nach Gerät unterschiedlich sein kann. Das Canvas sollte also in der Breite verstellbar sein.
+    </div>
+    
+    <br/>
+
+    <div>
+      <canvas id="canvas" width="230" height="150"></canvas>
+      <br/>
+      <input type="button" onclick="resize(-5)" value="-" /><input type="button" onclick="resize(+5)" value="+" />
+      <br/>
+      <input style="width:230px" type="text" name="code" id="code" value="23840120932160564445313235303031303531373036343834383938393044312C303005" />
+      <br/>
+      <input type="button" style="width:115px" onclick="start()" value="Start" /><input type="button" style="width:115px" onclick="stop()" value="Stop" />
+    </div>
+
+    <script type="text/javascript">
+    
+      var BLACK = "rgb(0,0,0)";
+      var WHITE = "rgb(255,255,255)";
+      
+      var bits = new Object();
+      bits['0'] = [0, 0, 0, 0, 0];
+      bits['1'] = [0, 1, 0, 0, 0];
+      bits['2'] = [0, 0, 1, 0, 0];
+      bits['3'] = [0, 1, 1, 0, 0];
+      bits['4'] = [0, 0, 0, 1, 0];
+      bits['5'] = [0, 1, 0, 1, 0];
+      bits['6'] = [0, 0, 1, 1, 0];
+      bits['7'] = [0, 1, 1, 1, 0];
+      bits['8'] = [0, 0, 0, 0, 1];
+      bits['9'] = [0, 1, 0, 0, 1];
+      bits['A'] = [0, 0, 1, 0, 1];
+      bits['B'] = [0, 1, 1, 0, 1];
+      bits['C'] = [0, 0, 0, 1, 1];
+      bits['D'] = [0, 1, 0, 1, 1];
+      bits['E'] = [0, 0, 1, 1, 1];
+      bits['F'] = [0, 1, 1, 1, 1];
+
+      var code = document.getElementById('code');
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+      clear();
+
+      var margin = 7;
+      
+      var interval;
+      var bitarray;
+      var halfbyteid;
+      var clock;
+
+      function resize(size)
+      {
+        var ns = canvas.width + size;
+        if (ns < 100 || ns > 1000)
+          return;
+        canvas.width = ns;
+        clear();
+      }
+      
+      function clear()
+      {
+        ctx.fillStyle = BLACK;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      
+      function step()
+      {
+        var barwidth = canvas.width / 5;
+        bitarray[halfbyteid][0] = clock;
+
+        for (i=0;i<5;++i)
+        {
+          ctx.fillStyle = (bitarray[halfbyteid][i] == 1) ? WHITE : BLACK;
+          ctx.fillRect(i*barwidth+margin, margin, barwidth-2*margin, canvas.height-2*margin);
+        }
+
+        clock--;
+        if (clock < 0)
+        {
+          clock = 1;
+          halfbyteid++;
+          if (halfbyteid >= bitarray.length)
+            halfbyteid = 0;
+        }
+      }
+
+      function stop()
+      {
+        window.clearInterval(interval);
+        clear();
+      }
+
+      function start()
+      {
+        stop();
+        
+        halfbyteid = 0;
+        clock = 1;
+        
+        var v = '0FFF' + code.value;
+        bitarray = new Array();
+        for (i = 0; i<v.length; i += 2)
+        {
+          bitarray[i] = bits[v[i+1]];
+          bitarray[i+1] = bits[v[i]];
+        }
+        interval = window.setInterval(step, 60);
+      }
+    </script>
+  </body>
+</html>
