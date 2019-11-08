@@ -10,12 +10,17 @@
 
 package de.willuhn.jameica.hbci.payment;
 
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
+import org.kapott.hbci.manager.MatrixCode;
+import org.kapott.hbci.manager.QRCode;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 
@@ -23,6 +28,7 @@ import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage.TANType;
 import de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Nachricht;
@@ -191,25 +197,22 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           // Gleich abspeichern
           Settings.setPinTanMedia(passport,retData.toString());
         }
-        break;
+        return;
 
       case NEED_PT_TAN:
+      case NEED_PT_PHOTOTAN:
+      case NEED_PT_QRTAN:
+        
         Logger.info("sending TAN message");
-        
-        BeanService service = Application.getBootLoader().getBootable(BeanService.class);
-        SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
-        Konto konto = session != null ? session.getKonto() : null;
-        
-        TANMessage tm = new TANMessage(msg, passport, konto);
-        Application.getMessagingFactory().sendSyncMessage(tm);
-        final String tan = tm.getTAN();
+        final String tan = this.getTAN(passport, reason, msg, retData);
         if (tan != null && tan.length() > 0)
         {
           Logger.info("got TAN message response, using TAN");
           retData.replace(0,retData.length(),tan);
           return;
         }
-        // Faellt durch bis zum Parent
+        
+        // Wenn wir keine TAN haben, soll es das Parent beantworten
         break;
         
         
@@ -283,6 +286,85 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         throw new HBCI_Exception("reason not implemented");
     }
     parent.callback(passport, reason, msg, datatype, retData);
+  }
+  
+  /**
+   * Fuehrt die TAN-Abfrage durch.
+   * @param passport der Passport.
+   * @param reason der Callback-Typ.
+   * @param msg die Message von HBCI4Java.
+   * @param retData Stringbuffer fuer die Austausch-Daten mit HBCI4Java.
+   * @return die TAN oder NULL, wenn keine ermittelt werden konnte.
+   */
+  private String getTAN(HBCIPassport passport, int reason, String msg, StringBuffer retData)
+  {
+    //////////////////////////////////////////////////////
+    // TAN-Typ ermitteln und Payload aufbereiten
+    TANType type = TANType.NORMAL;
+    String payload = retData.toString();
+
+    // Bei den ersten beiden TAN-Varianten ist es eindeutig anhand des Callbacks erkennbar
+    // Bei ChipTAN ist es daran erkennbar, wenn in retData etwas steht - das ist dann der Flickercode.
+    if (reason == HBCICallback.NEED_PT_PHOTOTAN || reason == HBCICallback.NEED_PT_QRTAN)
+    {
+      byte[] data = null;
+      String mime = null;
+      if (reason == HBCICallback.NEED_PT_PHOTOTAN)
+      {
+        type = TANType.PHOTOTAN;
+        MatrixCode code = MatrixCode.tryParse(payload);
+        if (code != null)
+        {
+          data = code.getImage();
+          mime = code.getMimetype();
+        }
+      }
+      else
+      {
+        type = TANType.QRTAN;
+        QRCode code = QRCode.tryParse(payload,msg);
+        if (code != null)
+        {
+          data = code.getImage();
+          mime = code.getMimetype();
+        }
+      }
+      
+      // Wenn das Parsen eines der beiden Codes geklappt hat, uebernehmen wir ihn Base64-codiert in den Payload
+      // Achtung: Wir duerfen hier kein MIME-codiertes Base64 verwenden, weil dort Zeilenumbrueche enthalten sind.
+      // Nur "rohes" Base64 gemaess RFC 4648 erlaubt.
+      // Ausserdem Mimetype und Encoding vorn dran schreiben
+      if (data != null)
+      {
+        mime = StringUtils.trimToNull(mime);
+        if (mime == null)
+        {
+          Logger.warn("got no mime type from server, using image/png as default");
+          mime = "image/png";
+        }
+        
+        Logger.info("image data for TAN payload: " + mime + ", " + data.length + " bytes");
+        Encoder enc = Base64.getEncoder();
+        payload = "data:" + mime + ";base64," + enc.encodeToString(data);
+      }
+    }
+    else if (retData != null && retData.length() > 0)
+    {
+      type = TANType.CHIPTAN;
+    }
+    //
+    //////////////////////////////////////////////////////
+      
+    Logger.info("sending TAN message, type " + type);
+    
+    
+    final BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+    final SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
+    final Konto konto = session != null ? session.getKonto() : null;
+    
+    TANMessage tm = new TANMessage(msg, passport, konto,type,payload);
+    Application.getMessagingFactory().sendSyncMessage(tm);
+    return tm.getTAN();
   }
   
   /**

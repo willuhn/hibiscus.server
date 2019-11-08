@@ -10,6 +10,7 @@
 
 package de.willuhn.jameica.hbci.payment.handler;
 
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.util.ApplicationException;
 
@@ -48,12 +49,10 @@ public interface TANHandler
   public void set(String id, String value) throws ApplicationException;
   
   /**
-   * Liefert die noetige TAN.
-   * @param text der von der Bank gelieferte Abfragetext.
-   * Dieser enthaelt bei iTAN u.a. die Nummer der einzugebenden TAN.
-   * @param konto ggf vorhandene Konto-Information. Kann <code>null</code> sein.
-   * @return die zu verwendende TAN.
+   * Erzeugt die noetige TAN.
+   * Die TAN wird nicht zurueckgeliefert sondern per "setTAN" in der TANMessage gespeichert.
+   * @param tanMessage die Message mit den Daten der TAN.
    * @throws Exception
    */
-  public String getTAN(String text, Konto konto) throws Exception;
+  public void getTAN(TANMessage tanMessage) throws Exception;
 }
