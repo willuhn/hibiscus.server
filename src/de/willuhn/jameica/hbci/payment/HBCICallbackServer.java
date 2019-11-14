@@ -14,6 +14,8 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.callback.HBCICallbackConsole;
@@ -24,6 +26,8 @@ import org.kapott.hbci.manager.QRCode;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 
+import de.willuhn.annotation.Lifecycle;
+import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
@@ -41,9 +45,12 @@ import de.willuhn.logging.Logger;
 /**
  * Wir ueberschreiben den Hibiscus-Callback, um alle HBCI-Aufrufe ueber uns zu leiten.
  */
+@Lifecycle(Type.CONTEXT)
 public class HBCICallbackServer extends AbstractHibiscusHBCICallback
 {
   private HBCICallback parent = null;
+
+  @Resource private HBCISynchronizeBackend backend = null;
 
   /**
    * ct.
@@ -62,6 +69,8 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
    */
   public void log(String msg, int level, Date date, StackTraceElement trace)
   {
+    SynchronizeSession session = this.backend.getCurrentSession();
+
     switch (level)
     {
       case HBCIUtils.LOG_DEBUG2:
@@ -89,6 +98,10 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         break;
 
       case HBCIUtils.LOG_ERR:
+        
+        if (session != null && msg != null)
+          session.getErrors().add(msg.replace("HBCI error code: ",""));
+        
         Logger.error(msg + " " + trace.toString());
         break;
 
@@ -132,6 +145,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
       case NEED_PT_SECMECH:
         Logger.info("GOT PIN/TAN secmech list: " + msg + " ["+retData.toString()+"]");
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_SECMECHLIST,retData.toString());
         
         // Checken, ob wir den Wert in der Session haben
         String secmech = (String) PassportsPinTan.SESSION.get(new Integer(reason));
@@ -167,6 +181,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
 
       case NEED_PT_TANMEDIA:
         Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_TANMEDIALIST,retData.toString());
         
         // Checken, ob wir den Wert in der Session haben
         String tanmedia = (String) PassportsPinTan.SESSION.get(new Integer(reason));
@@ -263,7 +278,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
 
       case USERID_CHANGED:
         Logger.info("got changed user/account data (code 3072) - saving in persistent data for later handling");
-        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_CONFIG,retData.toString());
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_USERID_CHANGED,retData.toString());
         return;
         
       case HBCICallback.NEED_CHIPCARD:
