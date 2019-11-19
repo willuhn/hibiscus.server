@@ -10,6 +10,7 @@
 
 package de.willuhn.jameica.hbci.payment;
 
+import java.rmi.RemoteException;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Date;
@@ -29,13 +30,17 @@ import org.kapott.hbci.passport.HBCIPassport;
 import de.willuhn.annotation.Lifecycle;
 import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
+import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
+import de.willuhn.jameica.hbci.MetaKey;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage.TANType;
 import de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan;
+import de.willuhn.jameica.hbci.rmi.HibiscusDBObject;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Nachricht;
+import de.willuhn.jameica.hbci.server.hbci.HBCIContext;
 import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.services.BeanService;
@@ -177,7 +182,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           // Gleich abspeichern
           Settings.setPinTanSecMech(passport,retData.toString());
         }
-        break;
+        return;
 
       case NEED_PT_TANMEDIA:
         Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
@@ -227,9 +232,26 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           return;
         }
         
-        // Wenn wir keine TAN haben, soll es das Parent beantworten
-        break;
-        
+        // Parent fragen
+        parent.callback(passport, reason, msg, datatype, retData);
+        if (retData == null || retData.length() == 0)
+        {
+          // Parent hat auch keine TAN geliefert - dann muessen wir den Auftrag als abgebrochen markieren
+          final HibiscusDBObject context = this.getContext(passport);
+          if (context != null)
+          {
+            try
+            {
+              Logger.info("mark job as tan cancelled: " + HBCIContext.toString(context));
+              MetaKey.TAN_CANCEL.set(context,HBCI.LONGDATEFORMAT.format(new Date()));
+            }
+            catch (RemoteException re)
+            {
+              Logger.error("unable to set tan cancel flag in object",re);
+            }
+          }
+        }
+        return;
         
       case NEED_CONNECTION:
       case CLOSE_CONNECTION:
@@ -301,6 +323,31 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         throw new HBCI_Exception("reason not implemented");
     }
     parent.callback(passport, reason, msg, datatype, retData);
+  }
+  
+  /**
+   * Versucht den zugehoerigen Auftrag zu ermitteln.
+   * @param passport der Passport.
+   * @return der Auftrag oder NULL, wenn er nicht ermittelbar war.
+   */
+  private HibiscusDBObject getContext(HBCIPassport passport)
+  {
+    String externalId = null;
+    
+    try
+    {
+      if (!(passport instanceof AbstractHBCIPassport))
+        return null;
+      
+      externalId = (String) ((AbstractHBCIPassport)passport).getPersistentData("externalid");
+      return HBCIContext.unserialize(externalId);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load transfer for external id: " + externalId,e);
+    }
+    
+    return null;
   }
   
   /**
