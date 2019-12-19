@@ -10,22 +10,37 @@
 
 package de.willuhn.jameica.hbci.payment;
 
+import java.rmi.RemoteException;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
+import org.kapott.hbci.manager.MatrixCode;
+import org.kapott.hbci.manager.QRCode;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 
+import de.willuhn.annotation.Lifecycle;
+import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.AbstractHibiscusHBCICallback;
+import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCICallbackSWT;
+import de.willuhn.jameica.hbci.MetaKey;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage.TANType;
 import de.willuhn.jameica.hbci.payment.web.beans.PassportsPinTan;
+import de.willuhn.jameica.hbci.rmi.HibiscusDBObject;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.rmi.Nachricht;
+import de.willuhn.jameica.hbci.server.hbci.HBCIContext;
 import de.willuhn.jameica.hbci.synchronize.SynchronizeSession;
 import de.willuhn.jameica.hbci.synchronize.hbci.HBCISynchronizeBackend;
 import de.willuhn.jameica.services.BeanService;
@@ -35,9 +50,12 @@ import de.willuhn.logging.Logger;
 /**
  * Wir ueberschreiben den Hibiscus-Callback, um alle HBCI-Aufrufe ueber uns zu leiten.
  */
+@Lifecycle(Type.CONTEXT)
 public class HBCICallbackServer extends AbstractHibiscusHBCICallback
 {
   private HBCICallback parent = null;
+
+  @Resource private HBCISynchronizeBackend backend = null;
 
   /**
    * ct.
@@ -56,6 +74,8 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
    */
   public void log(String msg, int level, Date date, StackTraceElement trace)
   {
+    SynchronizeSession session = this.backend.getCurrentSession();
+
     switch (level)
     {
       case HBCIUtils.LOG_DEBUG2:
@@ -83,6 +103,10 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         break;
 
       case HBCIUtils.LOG_ERR:
+        
+        if (session != null && msg != null)
+          session.getErrors().add(msg.replace("HBCI error code: ",""));
+        
         Logger.error(msg + " " + trace.toString());
         break;
 
@@ -126,6 +150,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         
       case NEED_PT_SECMECH:
         Logger.info("GOT PIN/TAN secmech list: " + msg + " ["+retData.toString()+"]");
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_SECMECHLIST,retData.toString());
         
         // Checken, ob wir den Wert in der Session haben
         String secmech = (String) PassportsPinTan.SESSION.get(new Integer(reason));
@@ -157,10 +182,11 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           // Gleich abspeichern
           Settings.setPinTanSecMech(passport,retData.toString());
         }
-        break;
+        return;
 
       case NEED_PT_TANMEDIA:
         Logger.info("PIN/TAN media name requested: " + msg + " ["+retData.toString()+"]");
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_TANMEDIALIST,retData.toString());
         
         // Checken, ob wir den Wert in der Session haben
         String tanmedia = (String) PassportsPinTan.SESSION.get(new Integer(reason));
@@ -191,27 +217,41 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           // Gleich abspeichern
           Settings.setPinTanMedia(passport,retData.toString());
         }
-        break;
+        return;
 
       case NEED_PT_TAN:
+      case NEED_PT_PHOTOTAN:
+      case NEED_PT_QRTAN:
+        
         Logger.info("sending TAN message");
-        
-        BeanService service = Application.getBootLoader().getBootable(BeanService.class);
-        SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
-        Konto konto = session != null ? session.getKonto() : null;
-        
-        TANMessage tm = new TANMessage(msg, passport, konto);
-        Application.getMessagingFactory().sendSyncMessage(tm);
-        final String tan = tm.getTAN();
+        final String tan = this.getTAN(passport, reason, msg, retData);
         if (tan != null && tan.length() > 0)
         {
           Logger.info("got TAN message response, using TAN");
           retData.replace(0,retData.length(),tan);
           return;
         }
-        // Faellt durch bis zum Parent
-        break;
         
+        // Parent fragen
+        parent.callback(passport, reason, msg, datatype, retData);
+        if (retData == null || retData.length() == 0)
+        {
+          // Parent hat auch keine TAN geliefert - dann muessen wir den Auftrag als abgebrochen markieren
+          final HibiscusDBObject context = this.getContext(passport);
+          if (context != null)
+          {
+            try
+            {
+              Logger.info("mark job as tan cancelled: " + HBCIContext.toString(context));
+              MetaKey.TAN_CANCEL.set(context,HBCI.LONGDATEFORMAT.format(new Date()));
+            }
+            catch (RemoteException re)
+            {
+              Logger.error("unable to set tan cancel flag in object",re);
+            }
+          }
+        }
+        return;
         
       case NEED_CONNECTION:
       case CLOSE_CONNECTION:
@@ -260,7 +300,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
 
       case USERID_CHANGED:
         Logger.info("got changed user/account data (code 3072) - saving in persistent data for later handling");
-        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_CONFIG,retData.toString());
+        ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_USERID_CHANGED,retData.toString());
         return;
         
       case HBCICallback.NEED_CHIPCARD:
@@ -283,6 +323,110 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         throw new HBCI_Exception("reason not implemented");
     }
     parent.callback(passport, reason, msg, datatype, retData);
+  }
+  
+  /**
+   * Versucht den zugehoerigen Auftrag zu ermitteln.
+   * @param passport der Passport.
+   * @return der Auftrag oder NULL, wenn er nicht ermittelbar war.
+   */
+  private HibiscusDBObject getContext(HBCIPassport passport)
+  {
+    String externalId = null;
+    
+    try
+    {
+      if (!(passport instanceof AbstractHBCIPassport))
+        return null;
+      
+      externalId = (String) ((AbstractHBCIPassport)passport).getPersistentData("externalid");
+      return HBCIContext.unserialize(externalId);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load transfer for external id: " + externalId,e);
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Fuehrt die TAN-Abfrage durch.
+   * @param passport der Passport.
+   * @param reason der Callback-Typ.
+   * @param msg die Message von HBCI4Java.
+   * @param retData Stringbuffer fuer die Austausch-Daten mit HBCI4Java.
+   * @return die TAN oder NULL, wenn keine ermittelt werden konnte.
+   */
+  private String getTAN(HBCIPassport passport, int reason, String msg, StringBuffer retData)
+  {
+    //////////////////////////////////////////////////////
+    // TAN-Typ ermitteln und Payload aufbereiten
+    TANType type = TANType.NORMAL;
+    String payload = retData.toString();
+
+    // Bei den ersten beiden TAN-Varianten ist es eindeutig anhand des Callbacks erkennbar
+    // Bei ChipTAN ist es daran erkennbar, wenn in retData etwas steht - das ist dann der Flickercode.
+    if (reason == HBCICallback.NEED_PT_PHOTOTAN || reason == HBCICallback.NEED_PT_QRTAN)
+    {
+      byte[] data = null;
+      String mime = null;
+      if (reason == HBCICallback.NEED_PT_PHOTOTAN)
+      {
+        type = TANType.PHOTOTAN;
+        MatrixCode code = MatrixCode.tryParse(payload);
+        if (code != null)
+        {
+          data = code.getImage();
+          mime = code.getMimetype();
+        }
+      }
+      else
+      {
+        type = TANType.QRTAN;
+        QRCode code = QRCode.tryParse(payload,msg);
+        if (code != null)
+        {
+          data = code.getImage();
+          mime = code.getMimetype();
+        }
+      }
+      
+      // Wenn das Parsen eines der beiden Codes geklappt hat, uebernehmen wir ihn Base64-codiert in den Payload
+      // Achtung: Wir duerfen hier kein MIME-codiertes Base64 verwenden, weil dort Zeilenumbrueche enthalten sind.
+      // Nur "rohes" Base64 gemaess RFC 4648 erlaubt.
+      // Ausserdem Mimetype und Encoding vorn dran schreiben
+      if (data != null)
+      {
+        mime = StringUtils.trimToNull(mime);
+        if (mime == null)
+        {
+          Logger.warn("got no mime type from server, using image/png as default");
+          mime = "image/png";
+        }
+        
+        Logger.info("image data for TAN payload: " + mime + ", " + data.length + " bytes");
+        Encoder enc = Base64.getEncoder();
+        payload = "data:" + mime + ";base64," + enc.encodeToString(data);
+      }
+    }
+    else if (retData != null && retData.length() > 0)
+    {
+      type = TANType.CHIPTAN;
+    }
+    //
+    //////////////////////////////////////////////////////
+      
+    Logger.info("sending TAN message, type " + type);
+    
+    
+    final BeanService service = Application.getBootLoader().getBootable(BeanService.class);
+    final SynchronizeSession session = service.get(HBCISynchronizeBackend.class).getCurrentSession();
+    final Konto konto = session != null ? session.getKonto() : null;
+    
+    TANMessage tm = new TANMessage(msg, passport, konto,type,payload);
+    Application.getMessagingFactory().sendSyncMessage(tm);
+    return tm.getTAN();
   }
   
   /**

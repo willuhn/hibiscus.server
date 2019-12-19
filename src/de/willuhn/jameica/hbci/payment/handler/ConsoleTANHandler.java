@@ -11,8 +11,11 @@
 package de.willuhn.jameica.hbci.payment.handler;
 
 import de.willuhn.jameica.hbci.payment.Plugin;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage.TANType;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
@@ -40,17 +43,23 @@ public class ConsoleTANHandler implements TANHandler
   }
   
   /**
-   * @see de.willuhn.jameica.hbci.payment.handler.TANHandler#getTAN(java.lang.String, de.willuhn.jameica.hbci.rmi.Konto)
+   * @see de.willuhn.jameica.hbci.payment.handler.TANHandler#getTAN(de.willuhn.jameica.hbci.payment.messaging.TANMessage)
    */
-  public String getTAN(String text, Konto konto) throws Exception
+  public void getTAN(TANMessage msg) throws Exception
   {
     String q = null;
+    Konto konto = msg.getKonto();
     if (konto != null)
-      q = i18n.tr("{0} [Konto {1}]",text,konto.getLongName());
+      q = i18n.tr("{0} [Konto {1}]",msg.getText(),konto.getLongName());
     else
-      q = text;
+      q = msg.getText();
+    
+    TANType type = msg.getType();
+    if (type != TANType.NORMAL)
+      Logger.warn("tan request (type: " + type + ") contains additional payload (image or flicker code), that cannot be displayed on console");
       
-    return Application.getCallback().askUser(q,i18n.tr("TAN"));
+    String tan = Application.getCallback().askUser(q,i18n.tr("TAN"));
+    msg.setTAN(tan);
   }
 
   /**

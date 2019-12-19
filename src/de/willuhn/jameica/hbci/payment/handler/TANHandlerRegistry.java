@@ -162,7 +162,7 @@ public class TANHandlerRegistry implements MessageConsumer
     HBCIPassport passport = tm.getPassport();
     
     if (passport == null || !(passport instanceof HBCIPassportPinTan))
-      throw new Exception("no valid PINTAN-Passport");
+      throw new Exception("no valid PIN/TAN passport");
     
     HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
     
@@ -173,7 +173,6 @@ public class TANHandlerRegistry implements MessageConsumer
       throw new Exception("no TAN handler found for config " + ppt.getFileName());
 
     Logger.info("retrieving TAN from handler");
-    String tan = handler.getTAN(tm.getText(),tm.getKonto());
-    tm.setTAN(tan);
+    handler.getTAN(tm);
   }
 }

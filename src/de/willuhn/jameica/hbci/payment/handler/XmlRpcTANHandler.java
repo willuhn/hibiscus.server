@@ -12,11 +12,14 @@ package de.willuhn.jameica.hbci.payment.handler;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import de.willuhn.jameica.hbci.payment.Plugin;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
+import de.willuhn.jameica.hbci.payment.messaging.TANMessage.TANType;
 import de.willuhn.jameica.hbci.payment.messaging.TrustMessageConsumer;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.system.Application;
@@ -33,11 +36,16 @@ public class XmlRpcTANHandler implements TANHandler
   private final static Settings settings = new Settings(XmlRpcTANHandler.class);
   private String config = "default";
   
-  private static ArrayList templates = new ArrayList();
+  private static List<Parameter> templates = new ArrayList<Parameter>();
   static
   {
     templates.add(new Parameter("url","URL des XML-RPC Servers","z.Bsp.: http://server/xmlrpc","http://localhost/xmlrpc"));
-    templates.add(new Parameter("method","Name der XML-RPC-Funktion","Der Funktion werden zwei Parameter übergeben. 1. Anzuzeigender Text, 2. ID des Kontos (optional). Rückgabewert der Funktion: Die zu verwendende TAN","hibiscus.getTan"));
+    templates.add(new Parameter("method","Name der XML-RPC-Funktion","Der Funktion werden vier Parameter übergeben.<br/>" +
+                                "&nbsp;1. Anzuzeigender Text<br/>" +
+                                "&nbsp;2. ID des Kontos (optional)<br/>" +
+                                "&nbsp;3. Typ des TAN-Vefahrens (NORMAL, CHIPTAN, PHOTOTAN oder QRTAN)<br/>" + 
+                                "&nbsp;4. Payload-Daten für die Ermittlung der TAN (bei CHIPTAN der Flickercode, bei PHOTOTAN/QRTAN das Bild als Data-URI z.B. \"data:image/png;base64,...\")<br/>" +
+                                "Rückgabewert der Funktion: Die zu verwendende TAN","hibiscus.getTan"));
     templates.add(new Parameter("username","Username","Optionale Angabe eines Usernamens falls ein HTTP-Login nötig ist",""));
     templates.add(new Parameter("password","Passwort","Optionale Angabe eines Passwortes falls ein HTTP-Login nötig ist",""));
   }
@@ -58,7 +66,7 @@ public class XmlRpcTANHandler implements TANHandler
     ArrayList parameters = new ArrayList();
     for (int i=0;i<templates.size();++i)
     {
-      Parameter param = (Parameter) ((Parameter)templates.get(i)).clone();
+      Parameter param = (Parameter)(templates.get(i)).clone();
       if ("password".equals(param.getId()))
       {
         String value = de.willuhn.jameica.hbci.payment.Settings.getHBCIPassword("tan.haendler.xmlrpc." + config + ".password");
@@ -88,9 +96,9 @@ public class XmlRpcTANHandler implements TANHandler
   }
 
   /**
-   * @see de.willuhn.jameica.hbci.payment.handler.TANHandler#getTAN(java.lang.String, de.willuhn.jameica.hbci.rmi.Konto)
+   * @see de.willuhn.jameica.hbci.payment.handler.TANHandler#getTAN(de.willuhn.jameica.hbci.payment.messaging.TANMessage)
    */
-  public String getTAN(String text, Konto konto) throws Exception
+  public void getTAN(TANMessage msg) throws Exception
   {
     I18N i18n = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getI18N();
 
@@ -129,9 +137,14 @@ public class XmlRpcTANHandler implements TANHandler
       // Client erzeugen und Config uebernehmen
       XmlRpcClient client = new XmlRpcClient();
       client.setConfig(clientConfig);
+
+      final Konto konto = msg.getKonto();
+      final String id = konto != null ? konto.getID() : "";
+      final String text = msg.getText();
+      final TANType type = msg.getType() != null ? msg.getType() : TANType.NORMAL;
       
-      String id = konto != null ? konto.getID() : "";
-      return (String) client.execute(method,new String[]{text,id});
+      final String tan = (String) client.execute(method,new String[]{text,id,type.name(),msg.getPayload()});
+      msg.setTAN(tan);
     }
     finally
     {

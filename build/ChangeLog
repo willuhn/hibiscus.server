@@ -1,3 +1,8 @@
+2019-12-19 Version 2.8.22
+
+  * Neues Release basierend auf Jameica 2.8.6 und Hibiscus 2.8.22
+  * Unterstützung für PhotoTAN, QRTAN, ChipTAN per XML/RPC TAN-Handler
+
 2019-11-02 Version 2.8.21
 
   * Neues Release basierend auf Jameica 2.8.6 und Hibiscus 2.8.21

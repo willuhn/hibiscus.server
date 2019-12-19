@@ -57,7 +57,7 @@ public class AccountDeviceImpl implements Device
           final Sensor<Double> s = new Sensor<Double>();
           s.setName(k.getLongName());
           s.setSerializer(DecimalSerializer.class);
-          s.setUuid(group.getUuid() + "." + k.getChecksum());
+          s.setUuid(Math.abs(group.getUuid().hashCode()) + "." + k.getChecksum());
           s.setValue(k.getSaldo());
           group.getSensors().add(s);
         }

@@ -165,7 +165,7 @@ public class Settings
     // Achtung: ppt.getCurrentTANMethod(false) kann eine Rekursion ausloesen,
     // wenn die Member-Variable "currentTANMethod" in AbstractPinTanPassport
     // noch NULL ist - daher der Check mit "recursion"
-    if (!recursion && passport == null && (passport instanceof HBCIPassportPinTan))
+    if (!recursion && passport != null && (passport instanceof HBCIPassportPinTan))
     {
       recursion = true;
       try
