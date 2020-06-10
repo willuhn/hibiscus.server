@@ -11,7 +11,6 @@
 package de.willuhn.jameica.hbci.payment.handler;
 
 import de.willuhn.jameica.hbci.payment.messaging.TANMessage;
-import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.util.ApplicationException;
 
 

@@ -11,6 +11,7 @@
 package de.willuhn.jameica.hbci.payment;
 
 import java.io.File;
+import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.kapott.hbci.passport.HBCIPassportPinTan;
 
 import de.willuhn.io.FileFinder;
 import de.willuhn.jameica.hbci.HBCI;
+import de.willuhn.jameica.hbci.PassportLoader;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.passports.ddv.DDVConfig;
 import de.willuhn.jameica.hbci.passports.pintan.PtSecMech;
@@ -143,14 +145,43 @@ public class Settings
   {
     try
     {
-      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
-      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      final PinTanConfig config = getPinTanConfig(passport);
       config.setStoredSecMech(PtSecMech.createFailsafe(value));
     }
     catch (Exception e)
     {
       Logger.error("unable to save secmech " + value + " in passport config",e);
     }
+  }
+  
+  /**
+   * Laedt die Passport-Konfiguration fuer den Passport.
+   * @param passport der Passport.
+   * @return die Konfiguration.
+   * @throws RemoteException
+   */
+  private static PinTanConfig getPinTanConfig(HBCIPassport passport) throws RemoteException
+  {
+    final HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
+    final PassportLoader loader = new PassportLoader() {
+      /**
+       * @see de.willuhn.jameica.hbci.PassportLoader#load()
+       */
+      @Override
+      public HBCIPassport load()
+      {
+        return ppt;
+      }
+      
+      /**
+       * @see de.willuhn.jameica.hbci.PassportLoader#reload()
+       */
+      @Override
+      public void reload()
+      {
+      }
+    };
+    return new PinTanConfigImpl(loader,new File(ppt.getFileName()));
   }
   
   /**
@@ -171,8 +202,7 @@ public class Settings
       try
       {
         // Checken, ob wir ein fest vorgegebenes TAN-Verfahren haben
-        HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
-        PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+        final PinTanConfig config = getPinTanConfig(passport);
         PtSecMech mech = config.getStoredSecMech();
         if (mech == null)
           mech = config.getCurrentSecMech();
@@ -184,6 +214,7 @@ public class Settings
         }
         
         // Checken, ob wir im Passport eines haben
+        final HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
         secMech = ppt.getCurrentTANMethod(false);
         if (secMech != null && secMech.length() > 0)
         {
@@ -243,8 +274,7 @@ public class Settings
   {
     try
     {
-      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
-      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      final PinTanConfig config = getPinTanConfig(passport);
       config.setTanMedia(tanmedia);
     }
     catch (Exception e)
@@ -263,8 +293,7 @@ public class Settings
   {
     try
     {
-      HBCIPassportPinTan ppt = (HBCIPassportPinTan) passport;
-      PinTanConfig config = new PinTanConfigImpl(ppt,new File(ppt.getFileName()));
+      final PinTanConfig config = getPinTanConfig(passport);
       return config.getTanMedia();
     }
     catch (Exception e)
