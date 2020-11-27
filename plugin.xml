@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<plugin name="hibiscus.server" version="2.9.0-nightly" class="de.willuhn.jameica.hbci.payment.Plugin"
+<plugin name="hibiscus.server" version="2.11.0-nightly" class="de.willuhn.jameica.hbci.payment.Plugin"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
 
@@ -9,21 +9,21 @@
   <homepage>http://www.willuhn.de/products/hibiscus-server</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
-  <requires jameica="2.6.0+">
+  <requires jameica="2.8.0+">
 
     <!-- Hibiscus selbst -->
-    <import plugin="hibiscus"         version="2.6.0+"/>
+    <import plugin="hibiscus"         version="2.8.0+"/>
 
     <!-- Plattform-Erweiterungen -->
-    <import plugin="jameica.webadmin" version="2.6.0+"/>
-    <import plugin="jameica.xmlrpc"   version="2.6.0+"/>
-    <import plugin="jameica.soap"     version="2.6.0+"/>
+    <import plugin="jameica.webadmin" version="2.8.0+"/>
+    <import plugin="jameica.xmlrpc"   version="2.8.0+"/>
+    <import plugin="jameica.soap"     version="2.8.0+"/>
 
-    <import plugin="jameica.sensors"  version="2.6.0+"/>
+    <import plugin="jameica.sensors"  version="2.8.0+"/>
 
     <!-- Hibiscus-Connectoren -->
-    <import plugin="hibiscus.xmlrpc"  version="2.6.0+"/>
-    <import plugin="hibiscus.soap"    version="2.6.0+"/>
+    <import plugin="hibiscus.xmlrpc"  version="2.8.0+"/>
+    <import plugin="hibiscus.soap"    version="2.8.0+"/>
   </requires>
 
   <classfinder>
