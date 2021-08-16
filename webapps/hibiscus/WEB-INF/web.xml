@@ -24,6 +24,12 @@
     <url-pattern>*.html</url-pattern>
   </servlet-mapping>
 
+  <!-- Damit auch die Basis-URL auf den Controller geht -->
+  <servlet-mapping>
+    <servlet-name>webtools</servlet-name>
+    <url-pattern></url-pattern>
+  </servlet-mapping>
+  
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
