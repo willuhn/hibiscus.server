@@ -177,12 +177,12 @@
     <zip destfile="releases/${release.filename}">
       <zipfileset prefix="${define.server.name}" dir="releases/${define.server.name}" filemode="755">
         <include name="*.sh"/>
-        <include name="rcjameica"/>
+        <include name="rcjameica*"/>
       </zipfileset>
       <zipfileset prefix="${define.server.name}" dir="releases/${define.server.name}">
         <include name="**"/>
         <exclude name="*.sh"/>
-        <exclude name="rcjameica"/>
+        <exclude name="rcjameica*"/>
       </zipfileset>
     </zip>
   </target>
