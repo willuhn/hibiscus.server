@@ -6,13 +6,13 @@
 
   <description>Hibiscus Payment-Server</description>
   <url></url>
-  <homepage>http://www.willuhn.de/products/hibiscus-server</homepage>
+  <homepage>https://www.willuhn.de/products/hibiscus-server</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
-  <requires jameica="2.8.0+">
+  <requires jameica="2.10.0+">
 
     <!-- Hibiscus selbst -->
-    <import plugin="hibiscus"         version="2.8.0+"/>
+    <import plugin="hibiscus"         version="2.10.0+"/>
 
     <!-- Plattform-Erweiterungen -->
     <import plugin="jameica.webadmin" version="2.8.0+"/>
