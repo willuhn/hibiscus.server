@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="/webadmin/css/styles.css">
     <link rel="stylesheet" type="text/css" href="/hibiscus/css/styles.css">
     <script language="JavaScript" src="/webadmin/js/common.js" type="text/javascript"></script>
-    <script language="JavaScript" src="/webadmin/js/jquery-3.3.1.min.js" type="text/javascript"></script>
+    <script language="JavaScript" src="/webadmin/js/jquery-3.7.1.min.js" type="text/javascript"></script>
   </head>
   
   <body>

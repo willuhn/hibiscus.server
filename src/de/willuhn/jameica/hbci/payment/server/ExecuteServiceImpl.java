@@ -16,6 +16,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 import java.util.List;
 
+import de.willuhn.jameica.hbci.messaging.NeueUmsaetze;
 import de.willuhn.jameica.hbci.payment.Plugin;
 import de.willuhn.jameica.hbci.payment.rmi.ExecuteService;
 import de.willuhn.jameica.hbci.payment.web.beans.Welcome;
@@ -70,6 +71,12 @@ public class ExecuteServiceImpl extends UnicastRemoteObject implements ExecuteSe
     try
     {
       Application.getMessagingFactory().sendSyncMessage(new StatusBarMessage(i18n.tr("Synchronisierung läuft"),StatusBarMessage.TYPE_SUCCESS));
+
+      // Wir müssen die IDs der ungelesenen Umsaetze neu aus der Datenbank lesen. Andernfalls würde die Liste der in NeueUmsaetze
+      // zwischengespeicherten IDs immer länger werden und weiterhin auch all jene Umsaetze enthalten, die zwischenzeitlich von
+      // Desktop-Clients als gelesen markiert wurden. Durch das Reload laden wir den aktuellen Ungelesen-Zustand von der Datenbank
+      // und ergänzen um die im folgenden hinzukommenden Umsätze
+      NeueUmsaetze.reload();
       
       BeanService service = Application.getBootLoader().getBootable(BeanService.class);
       SynchronizeEngine engine = service.get(SynchronizeEngine.class);
