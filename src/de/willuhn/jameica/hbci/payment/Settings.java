@@ -126,6 +126,15 @@ public class Settings
   }
   
   /**
+   * Liefert die Anzahl der Sekunden, die bei PushTAN Decoupled gewartet wird, bis das HKTAN gesendet wird.
+   * @return die Anzahl der Sekunden.
+   */
+  public static int getPushTanDecoupledWait()
+  {
+    return settings.getInt("tan.decoupled.wait.seconds",60);
+  }
+  
+  /**
    * Speichert das Scheduler-Intervall.
    * @param minutes
    */
