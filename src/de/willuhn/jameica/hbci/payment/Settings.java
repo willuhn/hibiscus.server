@@ -131,7 +131,7 @@ public class Settings
    */
   public static int getPushTanDecoupledWait()
   {
-    return settings.getInt("tan.decoupled.wait.seconds",60);
+    return settings.getInt("tan.decoupled.wait.seconds",120);
   }
   
   /**
