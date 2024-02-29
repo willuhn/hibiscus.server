@@ -126,6 +126,15 @@ public class Settings
   }
   
   /**
+   * Liefert die Anzahl der Sekunden, die bei PushTAN Decoupled gewartet wird, bis das HKTAN gesendet wird.
+   * @return die Anzahl der Sekunden.
+   */
+  public static int getPushTanDecoupledWait()
+  {
+    return settings.getInt("tan.decoupled.wait.seconds",120);
+  }
+  
+  /**
    * Speichert das Scheduler-Intervall.
    * @param minutes
    */
@@ -422,6 +431,15 @@ public class Settings
   public static void setNotifyUrl(String url)
   {
     settings.setAttribute("notify.url",url);
+  }
+
+  /**
+   * Liefert true, wenn PIN/TAN-Bankzugänge automatisch auf aktualisierte URLs migriert werden sollen, wenn diese bekannt werden.
+   * @return true, wenn PIN/TAN-Bankzugänge automatisch migriert werden sollen.
+   */
+  public static boolean isAutoMigratePinTan()
+  {
+    return settings.getBoolean("automigrate.pintan",true);
   }
   
   /**

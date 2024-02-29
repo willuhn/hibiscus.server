@@ -253,6 +253,24 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         }
         return;
         
+      case NEED_PT_DECOUPLED:
+        
+        // Wir warten hier einfach eine definierte Anzahl von Sekunden und setzen dann automatisch fort.
+        // Wenn man auf dem anderen Gerät schnell genug reagiert, wäre per Server tatsächlich
+        // auch die Ausführung von TAN-pflichtigen Geschäftsvorfällen wieder automatisierbar
+        final long seconds = Settings.getPushTanDecoupledWait() * 1000L;
+        Logger.info("Waiting " + seconds + " seconds for PushTAN decoupled confirmation from other device");
+        try
+        {
+          Thread.sleep(seconds);
+          Logger.info("Waited " + seconds + " seconds for PushTAN decoupled confirmation from other device. Continuing process");
+        }
+        catch (InterruptedException e)
+        {
+          Logger.error("interrupted",e);
+        }
+        return;
+        
       case NEED_CONNECTION:
       case CLOSE_CONNECTION:
         // Ueberschrieben, weil wir im Server-Mode davon ausgehen,
