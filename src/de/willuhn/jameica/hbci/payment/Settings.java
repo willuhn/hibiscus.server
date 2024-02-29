@@ -432,6 +432,15 @@ public class Settings
   {
     settings.setAttribute("notify.url",url);
   }
+
+  /**
+   * Liefert true, wenn PIN/TAN-Bankzugänge automatisch auf aktualisierte URLs migriert werden sollen, wenn diese bekannt werden.
+   * @return true, wenn PIN/TAN-Bankzugänge automatisch migriert werden sollen.
+   */
+  public static boolean isAutoMigratePinTan()
+  {
+    return settings.getBoolean("automigrate.pintan",true);
+  }
   
   /**
    * Liefert das Passwort fuer das Sicherheitsmedium oder null.
