@@ -47,7 +47,12 @@ public class TANMessage implements Message
     /**
      * QR-TAN. Das Bild mit dem QR-Code wird Base64-codiert im Payload uebertragen.
      */
-    QRTAN
+    QRTAN,
+    
+    /**
+     * PushTAN Decoupled.
+     */
+    DECPOUPLED
   }
   
   private String text           = null;

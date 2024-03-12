@@ -133,7 +133,16 @@ public class Settings
   {
     return settings.getInt("tan.decoupled.wait.seconds",120);
   }
-  
+
+  /**
+   * Liefert true, wenn auch bei PushTAN Decoupled der TAN-Handler gefragt werden soll, statt zu warten.
+   * @return true, wenn auch bei PushTAN Decoupled der TAN-Handler gefragt werden soll, statt zu warten.
+   */
+  public static boolean getPushTanDecoupledTanHandler()
+  {
+    return settings.getBoolean("tan.decoupled.tanhandler",false);
+  }
+
   /**
    * Speichert das Scheduler-Intervall.
    * @param minutes

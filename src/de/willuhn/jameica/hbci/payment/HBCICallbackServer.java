@@ -222,6 +222,26 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
       case NEED_PT_TAN:
       case NEED_PT_PHOTOTAN:
       case NEED_PT_QRTAN:
+      case NEED_PT_DECOUPLED:
+        
+        if (reason == NEED_PT_DECOUPLED && !Settings.getPushTanDecoupledTanHandler())
+        {
+          // Wir warten hier einfach eine definierte Anzahl von Sekunden und setzen dann automatisch fort.
+          // Wenn man auf dem anderen Gerät schnell genug reagiert, wäre per Server tatsächlich
+          // auch die Ausführung von TAN-pflichtigen Geschäftsvorfällen wieder automatisierbar
+          final long seconds = Settings.getPushTanDecoupledWait() * 1000L;
+          Logger.info("Waiting " + seconds + " seconds for PushTAN decoupled confirmation from other device");
+          try
+          {
+            Thread.sleep(seconds);
+            Logger.info("Waited " + seconds + " seconds for PushTAN decoupled confirmation from other device. Continuing process");
+          }
+          catch (InterruptedException e)
+          {
+            Logger.error("interrupted",e);
+          }
+          return;
+        }
         
         Logger.info("sending TAN message");
         final String tan = this.getTAN(passport, reason, msg, retData);
@@ -250,24 +270,6 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
               Logger.error("unable to set tan cancel flag in object",re);
             }
           }
-        }
-        return;
-        
-      case NEED_PT_DECOUPLED:
-        
-        // Wir warten hier einfach eine definierte Anzahl von Sekunden und setzen dann automatisch fort.
-        // Wenn man auf dem anderen Gerät schnell genug reagiert, wäre per Server tatsächlich
-        // auch die Ausführung von TAN-pflichtigen Geschäftsvorfällen wieder automatisierbar
-        final long seconds = Settings.getPushTanDecoupledWait() * 1000L;
-        Logger.info("Waiting " + seconds + " seconds for PushTAN decoupled confirmation from other device");
-        try
-        {
-          Thread.sleep(seconds);
-          Logger.info("Waited " + seconds + " seconds for PushTAN decoupled confirmation from other device. Continuing process");
-        }
-        catch (InterruptedException e)
-        {
-          Logger.error("interrupted",e);
         }
         return;
         
@@ -427,6 +429,10 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         Encoder enc = Base64.getEncoder();
         payload = "data:" + mime + ";base64," + enc.encodeToString(data);
       }
+    }
+    else if (reason == HBCICallback.NEED_PT_DECOUPLED)
+    {
+      type = TANType.DECPOUPLED;
     }
     else if (retData != null && retData.length() > 0)
     {
