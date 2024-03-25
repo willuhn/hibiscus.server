@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -180,6 +181,8 @@ public class PassportsPinTan extends AbstractPassports
     boolean update = this.config != null;
     TrustMessageConsumer tmc = new TrustMessageConsumer();
 
+    String blz = request.getParameter("blz");
+
     try
     {
       /////////////////////////////////////////////////////////////////
@@ -207,7 +210,6 @@ public class PassportsPinTan extends AbstractPassports
       String kundenkennung   = request.getParameter("kundenkennung");
       String url             = request.getParameter("url");
       String version         = request.getParameter("version");
-      String blz             = request.getParameter("blz");
       String secmech         = request.getParameter("secmech");
       String tanmedia        = request.getParameter("tanmedia");
       
@@ -343,9 +345,14 @@ public class PassportsPinTan extends AbstractPassports
     }
     catch (Exception e)
     {
-      if (!update && config != null)
+      // Sonderrolle ING. Siehe https://homebanking-hilfe.de/forum/topic.php?p=170637#real170637
+      // Deren FinTS-Server ist so kaputt, dass das Anlegen des Bankzugangs im ersten Schritt
+      // immer scheitert. Daher können wir deren Bankzugänge beim Neuanlegen nicht löschen
+      // Im Fehlerfall die Config wieder loeschen. Aber nur bei Neuanlage
+      boolean isIng = (Objects.equals(blz,"50010517"));
+        
+      if (!update && config != null && !isIng)
       {
-        // Im Fehlerfall die Config wieder loeschen. Aber nur bei Neuanlage
         try
         {
           PinTanConfigFactory.delete(config);
