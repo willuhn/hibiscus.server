@@ -229,12 +229,12 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           // Wir warten hier einfach eine definierte Anzahl von Sekunden und setzen dann automatisch fort.
           // Wenn man auf dem anderen Gerät schnell genug reagiert, wäre per Server tatsächlich
           // auch die Ausführung von TAN-pflichtigen Geschäftsvorfällen wieder automatisierbar
-          final long seconds = Settings.getPushTanDecoupledWait() * 1000L;
-          Logger.info("Waiting " + seconds + " seconds for PushTAN decoupled confirmation from other device");
+          final long millis = Settings.getPushTanDecoupledWait() * 1000L;
+          Logger.info("Waiting " + millis + "ms for PushTAN decoupled confirmation from other device");
           try
           {
-            Thread.sleep(seconds);
-            Logger.info("Waited " + seconds + " seconds for PushTAN decoupled confirmation from other device. Continuing process");
+            Thread.sleep(millis);
+            Logger.info("Waited " + millis + "ms for PushTAN decoupled confirmation from other device. Continuing process");
           }
           catch (InterruptedException e)
           {
