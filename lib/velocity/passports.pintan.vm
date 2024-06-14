@@ -87,7 +87,9 @@
           <td>
             <a title="Konfiguration bearbeiten" href="javascript:doEdit('$format.escapePath($p.filename)')"><img src="img/open.png" width="16" height="16" border="0" style="margin-right: 5px">Öffnen...</a>
             <br/>
-            <a title="Liste der zugeordneten Konten aktualisieren" href="javascript:doUpdate('$format.escapePath($p.filename)')"><img src="img/view-refresh.png" width="16" height="16" border="0" style="margin-right: 5px">Konten aktualisieren</a>
+            <a title="Liste der zugeordneten Konten aktualisieren" href="javascript:doUpdate('$format.escapePath($p.filename)')"><img src="img/system-file-manager.png" width="16" height="16" border="0" style="margin-right: 5px">Konten aktualisieren</a>
+            <br/>
+            <a title="Neu synchronisieren" href="javascript:doSync('$format.escapePath($p.filename)')"><img src="img/view-refresh.png" width="16" height="16" border="0" style="margin-right: 5px">Neu synchronisieren</a>
             <br/>
             <a title="Konfiguration löschen"    href="javascript:doDelete('$format.escapePath($p.filename)')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
           </td>
@@ -251,6 +253,13 @@
   function doUpdate(v)
   {
     document.form1.elements.action.value = "update";
+    document.form1.elements.config.value = v;
+    document.form1.submit();
+  }
+
+  function doSync(v)
+  {
+    document.form1.elements.action.value = "sync";
     document.form1.elements.config.value = v;
     document.form1.submit();
   }
