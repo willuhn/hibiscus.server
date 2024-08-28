@@ -48,7 +48,7 @@
 
 <h2>$c.name</h2>
 
-<form method="post" name="form1" autocomplete="off">
+<form method="post" name="form1" autocomplete="off" accept-charset="utf-8">
   <input type="hidden" name="action" value="">
   <input type="hidden" name="config" value="$format.escapePath($c.currentConfig.filename)">
 
