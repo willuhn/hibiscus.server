@@ -41,7 +41,7 @@
 
 <h2>$c.name</h2>
 
-<form method="post" name="form1">
+<form method="post" name="form1" accept-charset="utf-8">
   <input type="hidden" name="action" value="">
   <input type="hidden" name="key" value="">
 
@@ -89,7 +89,7 @@
 
 <h3>Neue Schlüsseldiskette hochladen</h3>
 
-<form method="post" name="form2" enctype="multipart/form-data">
+<form method="post" name="form2" enctype="multipart/form-data" accept-charset="utf-8">
 
   <table class="data">	
     <tr>

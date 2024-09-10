@@ -23,13 +23,16 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.kapott.hbci.callback.HBCICallback;
+import org.kapott.hbci.manager.HBCIHandler;
 
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.hbci.SynchronizeOptions;
+import de.willuhn.jameica.hbci.gui.action.PassportDeleteBPD;
 import de.willuhn.jameica.hbci.passport.Passport;
 import de.willuhn.jameica.hbci.passport.PassportHandle;
 import de.willuhn.jameica.hbci.passports.pintan.PinTanConfigFactory;
 import de.willuhn.jameica.hbci.passports.pintan.PtSecMech;
+import de.willuhn.jameica.hbci.passports.pintan.PtSecMechDeleteSettings;
 import de.willuhn.jameica.hbci.passports.pintan.rmi.PinTanConfig;
 import de.willuhn.jameica.hbci.passports.pintan.server.PassportHandleImpl;
 import de.willuhn.jameica.hbci.passports.pintan.server.PassportImpl;
@@ -128,6 +131,46 @@ public class PassportsPinTan extends AbstractPassports
     }
   }
   
+  /**
+   * Action zum Neu-Synchronisieren des Bankzugangs.
+   */
+  public void sync()
+  {
+    try
+    {
+      if (this.config == null)
+        throw new ApplicationException(i18n.tr("Keine PIN/TAN-Konfiguration ausgewählt"));
+
+      Logger.info("create passport handle");
+      
+      new PtSecMechDeleteSettings().handleAction(this.config);
+      
+      PassportHandle handle = new PassportHandleImpl(this.config);
+      HBCIHandler handler = handle.open();
+      new PassportDeleteBPD().handleAction(handler.getPassport());
+      handler.sync(true);
+      handle.close(); // nein, nicht im finally, denn wenn das Oeffnen fehlschlaegt, ist nichts zum Schliessen da
+
+      Logger.info("sync passport");
+      Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Bankzugang synchronisiert."), StatusBarMessage.TYPE_SUCCESS));
+    }
+    catch (Exception e)
+    {
+      String msg = e.getMessage();
+      if (!(e instanceof ApplicationException))
+      {
+        Logger.error("error while synchronizing pin/tan config",e);
+        msg = i18n.tr("Fehler beim Synchronisieren: {0}",e.getMessage());
+      }
+      Application.getMessagingFactory().sendMessage(new StatusBarMessage(msg,StatusBarMessage.TYPE_ERROR));
+    }
+    finally
+    {
+      // Geladene Config loeschen, damit wir nicht in die Detail-View wechseln
+      this.config = null;
+    }
+  }
+
   /**
    * Loescht die aktuelle PIN/TAN-Config.
    * @throws Exception

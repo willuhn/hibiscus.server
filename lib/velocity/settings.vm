@@ -12,7 +12,7 @@
 
       <h2>System-Einstellungen</h2>
       
-      <form method="post" name="settings">
+      <form method="post" name="settings" accept-charset="utf-8">
         <input type="hidden" name="action" value="storeSettings" />
         <table class="data">
           <tr>
@@ -81,7 +81,7 @@
       
       <h2>Benachrichtigungen</h2>
 
-      <form method="post" name="notify">
+      <form method="post" name="notify" accept-charset="utf-8">
         <input type="hidden" name="action" value="storeNotify" />
         <input type="hidden" name="notifyEnabled" value="$c.notifyEnabled" />
         <table class="data">
@@ -145,7 +145,7 @@
       
       <h2>XML-RPC Einstellungen</h2>
 
-      <form method="post" name="xmlrpc">
+      <form method="post" name="xmlrpc" accept-charset="utf-8">
         <input type="hidden" name="action" value="storeXmlrpc" />
         <table class="data">
           <tr>

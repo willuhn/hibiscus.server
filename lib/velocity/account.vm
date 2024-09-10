@@ -40,7 +40,7 @@
 
 #if($c.account)
   
-  <form method="post" name="form1">
+  <form method="post" name="form1" accept-charset="utf-8">
     <input type="hidden" name="action" value="">
 
     #set($options = $c.options)
