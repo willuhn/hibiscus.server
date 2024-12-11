@@ -79,13 +79,13 @@
         <exclude name="**/lib/swt/linux64/**"/>
         <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
-        <exclude name="**/lib/swt/win64/**"/>
+        <exclude name="**/lib/swt/win32/**"/>
         <exclude name="jre-*/**" />
 
       	<exclude name="**/lib/splash.jar"/>
         <exclude name="**/lib/mckoi/**"/>
       	
-        <exclude name="jameica*-win64*" />
+        <exclude name="jameica*-win32*" />
         <exclude name="jameica*-linuxarm64*" />
         <exclude name="jameica*-linux64*" />
       	<exclude name="jameica*-macos*" />

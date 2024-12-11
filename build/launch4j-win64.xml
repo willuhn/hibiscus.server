@@ -1,23 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>console</headerType>
-  <jar>jameica-win32.jar</jar>
-  <outfile>/work/willuhn/git/hibiscus.server/build/jameicaserver.exe</outfile>
+  <jar>jameica-win64.jar</jar>
+  <outfile>C:\work\git\hibiscus.server\build\jameicaserver.exe</outfile>
   <errTitle>Bitte installiere Java.</errTitle>
   <cmdLine>-d</cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.com/download</downloadUrl>
+  <downloadUrl>https://adoptium.net/de/</downloadUrl>
   <supportUrl></supportUrl>
-  <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>/work/willuhn/git/hibiscus/icons/hibiscus.ico</icon>
+  <icon>C:\work\git\hibiscus\icons\hibiscus.ico</icon>
   <jre>
-    <path></path>
-    <minVersion>1.6.0</minVersion>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion>11</minVersion>
     <maxVersion></maxVersion>
-    <jdkPreference>preferJre</jdkPreference>
     <opt>-Xmx256m -Djava.net.preferIPv4Stack=true</opt>
   </jre>
   <versionInfo>
@@ -31,5 +33,7 @@
     <companyName>Olaf Willuhn</companyName>
     <internalName>jameicaserver</internalName>
     <originalFilename>jameicaserver.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
 </launch4jConfig>
