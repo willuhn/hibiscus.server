@@ -18,7 +18,7 @@
     <path>%JAVA_HOME%;%PATH%</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>false</requires64Bit>
-    <minVersion>11</minVersion>
+    <minVersion>17</minVersion>
     <maxVersion></maxVersion>
     <opt>-Xmx256m -Djava.net.preferIPv4Stack=true</opt>
   </jre>
