@@ -358,7 +358,7 @@ public class PassportsPinTan extends AbstractPassports
       if (th != null && th.length() > 0)
       {
         TANHandler tanHandler = this.getCurrentTanHandler();
-        if (tanHandler == null)
+        if (tanHandler == null || !Objects.equals(th,tanHandler.getClass().getName()))
           tanHandler = TANHandlerRegistry.createTANHandler(th,new Format().escapePath(this.config.getFilename()));
 
         Iterator keys = request.getParameterMap().keySet().iterator();
