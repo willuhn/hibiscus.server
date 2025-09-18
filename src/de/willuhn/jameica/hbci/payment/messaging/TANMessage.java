@@ -52,7 +52,7 @@ public class TANMessage implements Message
     /**
      * PushTAN Decoupled.
      */
-    DECPOUPLED
+    DECOUPLED
   }
   
   private String text           = null;

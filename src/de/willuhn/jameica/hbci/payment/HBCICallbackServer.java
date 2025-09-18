@@ -432,7 +432,7 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
     }
     else if (reason == HBCICallback.NEED_PT_DECOUPLED)
     {
-      type = TANType.DECPOUPLED;
+      type = TANType.DECOUPLED;
     }
     else if (retData != null && retData.length() > 0)
     {
