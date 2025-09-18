@@ -224,7 +224,9 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
       case NEED_PT_QRTAN:
       case NEED_PT_DECOUPLED:
         
-        if (reason == NEED_PT_DECOUPLED && !Settings.getPushTanDecoupledTanHandler())
+        final boolean haveDecoupled = (reason == NEED_PT_DECOUPLED);
+        
+        if (haveDecoupled && !Settings.getPushTanDecoupledTanHandler())
         {
           // Wir warten hier einfach eine definierte Anzahl von Sekunden und setzen dann automatisch fort.
           // Wenn man auf dem anderen Gerät schnell genug reagiert, wäre per Server tatsächlich
@@ -243,9 +245,14 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
           return;
         }
         
-        Logger.info("sending TAN message");
+        Logger.info("sending TAN message (decoupled: " + haveDecoupled + ")");
         final String tan = this.getTAN(passport, reason, msg, retData);
-        if (tan != null && tan.length() > 0)
+        if (haveDecoupled)
+        {
+          Logger.info("got decoupled TAN message response, continuing process");
+          return;
+        }
+        else if (tan != null && tan.length() > 0)
         {
           Logger.info("got TAN message response, using TAN");
           retData.replace(0,retData.length(),tan);
