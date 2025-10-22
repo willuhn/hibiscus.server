@@ -330,18 +330,24 @@ public class HBCICallbackServer extends AbstractHibiscusHBCICallback
         ((AbstractHBCIPassport)passport).setPersistentData(PassportHandle.CONTEXT_USERID_CHANGED,retData.toString());
         return;
         
-      case HBCICallback.NEED_CHIPCARD:
+      case NEED_CHIPCARD:
         Logger.debug("callback: need chipcard");
         return;
-      case HBCICallback.HAVE_CHIPCARD:
+      case HAVE_CHIPCARD:
         Logger.debug("callback: have chipcard");
         return;
         
-      case HBCICallback.NEED_HARDPIN:
-      case HBCICallback.HAVE_HARDPIN:
+      case NEED_HARDPIN:
+      case HAVE_HARDPIN:
         throw new HBCI_Exception("hard pin not allowed in payment server");
 
-      case HBCICallback.NEED_REMOVE_CHIPCARD:
+      case NEED_REMOVE_CHIPCARD:
+        return;
+        
+      case HAVE_VOP_RESULT:
+        final boolean approve = Settings.isVoPApprove();
+        Logger.info("have VoP result: auto approve: " + approve);
+        retData.replace(0,retData.length(),Boolean.toString(approve));
         return;
 
         // Implementiert, weil die Console-Impl Eingaben von STDIN erfordern

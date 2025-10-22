@@ -452,6 +452,15 @@ public class Settings
   }
   
   /**
+   * Liefert true, wenn VoP-Anfragen generell freigegeben werden sollen.
+   * @return true, wenn VoP-Anfragen generell freigegeben werden sollen.
+   */
+  public static boolean isVoPApprove()
+  {
+    return settings.getBoolean("vop.approve",false);
+  }
+  
+  /**
    * Liefert das Passwort fuer das Sicherheitsmedium oder null.
    * @param passport das Sicherheitsmedium.
    * @param reason zusaetzlicher Code fuer den Zweck.
