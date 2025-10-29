@@ -1,37 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!--
- $Revision: 1.2 $
- $Date: 2011/11/17 21:57:04 $
- $Author: willuhn $
-
- Copyright (c) by willuhn software & services
- All rights reserved
--->
-
 <project basedir=".." default="all" name="All">
 
 	<target name="init" description="inits the build">
 
 		<property environment="env" />
 		<property name="build.dir" value="build" />
-    <buildnumber file="${build.dir}/BUILD" />
     <xmlproperty file="plugin.xml" collapseattributes="true"/>
-
-    <!-- create tag -->
-    <propertyfile file="${build.dir}/TAG">
-      <entry key="mytag" value="${plugin.version}" />
-    </propertyfile>
-    <replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_" />
-    <loadproperties srcFile="${build.dir}/TAG"/>
-    <delete file="${build.dir}/TAG" />
-    <property name="tag" value="V_${mytag}_BUILD_${build.number}" />
 
     <loadproperties srcFile="${build.dir}/build.properties"/>
 
 		<echo message="VERSION: ${plugin.version}" />
-        <echo message="Tag    : ${tag}" />
-		<echo message="BUILD  : ${build.number}" />
 		<echo message="JAVA   : ${java.version}" />
 
 		<property name="define.jarfilename" 		value="${plugin.name}.jar" />
@@ -40,7 +19,7 @@
 		<property name="define.javadocfilename" value="${plugin.name}.javadoc.zip" />
 
 		<property name="project.nightly" 			  value="releases/nightly" />
-		<property name="project.release" 			  value="releases/${plugin.version}-${build.number}" />
+		<property name="project.release" 			  value="releases/${plugin.version}" />
 		<property name="project.tmp" 				    value="${project.release}/tmp" />
 		<property name="project.javadoc" 			  value="${project.release}/javadoc" />
 		<property name="project.zipdir" 			  value="${project.release}/${plugin.name}" />
@@ -84,20 +63,6 @@
 		</javac>
 	</target>
 
-
-
-	<target depends="compile" name="tag" description="tags the source in the SCM">
-
-		<exec executable="git" failonerror="true" dir="${basedir}">
-			<arg line="tag -m ${tag} ${tag}" />
-		</exec>
-
-    <exec executable="git" failonerror="true" dir="${basedir}">
-      <arg line="push origin ${tag}" />
-    </exec>
-
-	</target>
-
 	<!-- Libs nur dann hinzufuegen, wenn sie existieren -->
 	<target name="addlib" if="havelib">
 		<mkdir dir="${project.zipdir}/lib" />
@@ -124,7 +89,6 @@
 				<attribute name="Built-Date" value="${DSTAMP}" />
 				<attribute name="Implementation-Title" value="${plugin.name}" />
 				<attribute name="Implementation-Version" value="${plugin.version}" />
-				<attribute name="Implementation-Buildnumber" value="${build.number}" />
         <attribute name="Class-Path" value="lang help lib" />
       </manifest>
 			<fileset dir="${class.dir}" />
@@ -225,7 +189,7 @@
 		</exec>
 	</target>
 
-	<target depends="init,compile,tag,signzip,javadoc,src,sign,clean" description="build an official release" name="all" />
+	<target depends="init,compile,signzip,javadoc,src,sign,clean" description="build an official release" name="all" />
 
 	<target depends="init,compile,signzip,clean" description="build inofficial release" name="fast" />
 

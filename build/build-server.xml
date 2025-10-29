@@ -1,26 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!--
- $Revision: 1.2 $
- $Date: 2011/11/12 15:52:41 $
- $Author: willuhn $
- 
- Copyright (c) by willuhn software & services
- All rights reserved
- 
- Build-Script, um die komplette Server-Distribution des Payment-Servers
- zu erstellen. Es erstellt ein ZIP-Archiv mit Jameica und den Plugins:
- 
- - jameica.webadmin
- - jameica.xmlrpc
- - jameica.soap
- - jameica.sensors
- - hibiscus
- - hibiscus.xmlrpc
- - hibiscus.soap
- - hibiscus.server
--->
-
 <project basedir=".." default="all" name="All">
 
 	<target name="init" description="inits the build">
@@ -29,19 +8,9 @@
     <xmlproperty file="../jameica/plugin.xml" collapseattributes="true" prefix="jameica"/>
     <xmlproperty file="../hibiscus/plugin.xml" collapseattributes="true" prefix="hibiscus"/>
 
-    <!-- create SCM tag -->
-    <propertyfile file="build/TAG">
-      <entry key="mytag" value="${plugin.version}" />
-    </propertyfile>
-    <replaceregexp flags="g" file="build/TAG" match="\." replace="_" />
-    <loadproperties srcFile="build/TAG"/>
-    <delete file="build/TAG" />
-    <property name="tag" value="HIBISCUS_SERVER_${mytag}" />
-		
-		<property name="release.filename"    value="${define.server.name}-${plugin.version}.zip" />
+		<property name="release.filename" value="${define.server.name}-${plugin.version}.zip" />
 
     <echo message="VERSION: ${plugin.version}" />
-    <echo message="TAG    : ${tag}" />
     <echo message="JAVA   : ${java.version}" />
 	</target>
 
@@ -79,18 +48,14 @@
         <exclude name="**/lib/swt/linux64/**"/>
         <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
-        <exclude name="**/lib/swt/win32/**"/>
         <exclude name="jre-*/**" />
 
       	<exclude name="**/lib/splash.jar"/>
         <exclude name="**/lib/mckoi/**"/>
       	
-        <exclude name="jameica*-win32*" />
         <exclude name="jameica*-linuxarm64*" />
         <exclude name="jameica*-linux64*" />
       	<exclude name="jameica*-macos*" />
-        <exclude name="jameica*-openbsd*" />
-        <exclude name="jameica*-osol*" />
         <exclude name="*.exe" />
         <exclude name="*.bat" />
         <exclude name="jameica.sh" />
