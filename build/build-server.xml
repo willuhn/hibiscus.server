@@ -54,7 +54,6 @@
         <exclude name="**/lib/mckoi/**"/>
       	
         <exclude name="jameica*-linuxarm64*" />
-        <exclude name="jameica*-linux64*" />
       	<exclude name="jameica*-macos*" />
         <exclude name="*.exe" />
         <exclude name="*.bat" />
