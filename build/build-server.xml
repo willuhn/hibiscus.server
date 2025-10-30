@@ -44,8 +44,7 @@
   	<move todir="releases/${define.server.name}">
       <fileset dir="releases/${define.server.name}/jameica">
         <include name="**"/>
-      	<!-- Wir brauchen wenigstens einmal die swt.jar fuer den Classloader - auch wenn sie nicht genutzt werden -->
-        <exclude name="**/lib/swt/linux64/**"/>
+      	<!-- Wir brauchen SWT für Linux64 und Win64 im Classpath - auch wenn wir es nicht nutzen -->
         <exclude name="**/lib/swt/linux-arm64/**"/>
         <exclude name="**/lib/swt/macos*/**"/>
         <exclude name="jre-*/**" />
