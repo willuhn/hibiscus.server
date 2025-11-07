@@ -523,14 +523,14 @@ public class Settings
     
     if ((passport instanceof FileBasedPassport))
     {
-        String filename = ((FileBasedPassport) passport).getFilename();
-        if (filename != null)
-        {
-          File f = new File(filename);
-          return f.getName();
-        }
-        return null;
-      }
+	  String filename = ((FileBasedPassport) passport).getFilename();
+	  if (filename != null)
+	  {
+	    File f = new File(filename);
+	    return f.getName();
+	  }
+	  return null;
+	}
     else if (passport instanceof HBCIPassportPinTan)
     {
       String filename = ((HBCIPassportPinTan) passport).getFileName();
