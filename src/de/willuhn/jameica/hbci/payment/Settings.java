@@ -20,7 +20,7 @@ import java.util.Random;
 
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.passport.AbstractHBCIPassport;
-import org.kapott.hbci.passport.AbstractRDHSWFileBasedPassport;
+import org.kapott.hbci.passport.FileBasedPassport;
 import org.kapott.hbci.passport.HBCIPassport;
 import org.kapott.hbci.passport.HBCIPassportDDV;
 import org.kapott.hbci.passport.HBCIPassportPinTan;
@@ -521,16 +521,16 @@ public class Settings
       return null;
     }
     
-    if ((passport instanceof AbstractRDHSWFileBasedPassport))
+    if ((passport instanceof FileBasedPassport))
     {
-      String filename = ((AbstractRDHSWFileBasedPassport) passport).getFilename();
-      if (filename != null)
-      {
-        File f = new File(filename);
-        return f.getName();
-      }
-      return null;
-    }
+	  String filename = ((FileBasedPassport) passport).getFilename();
+	  if (filename != null)
+	  {
+	    File f = new File(filename);
+	    return f.getName();
+	  }
+	  return null;
+	}
     else if (passport instanceof HBCIPassportPinTan)
     {
       String filename = ((HBCIPassportPinTan) passport).getFileName();
