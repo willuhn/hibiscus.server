@@ -11,6 +11,8 @@
 
 package de.willuhn.jameica.hbci.payment.web.beans;
 
+import java.util.List;
+
 import de.willuhn.jameica.hbci.PassportRegistry;
 import de.willuhn.jameica.hbci.passport.Passport;
 
@@ -24,7 +26,7 @@ public class Passports
    * @return Liste der installierten Passports.
    * @throws Exception
    */
-  public Passport[] getPassports() throws Exception
+  public List<Passport> getPassports() throws Exception
   {
     return PassportRegistry.getPassports();
   }
